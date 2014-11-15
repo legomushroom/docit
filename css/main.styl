@@ -1,45 +1,11 @@
-@import 'assets/imports.styl'
-@import 'css-assets/normalize.styl'
+@import 'assets/normalize.styl'
+@import 'general/*'
 
-@import 'css-assets/general'
-@import 'css-assets/blocks'
-@import 'css-assets/elements'
-@import 'css-assets/layouts'
-@import 'css-assets/grid'
-@import 'css-assets/effects'
-@import 'css-assets/icons'
+// @import 'css-assets/general'
+// @import 'css-assets/blocks'
+// @import 'css-assets/elements'
+// @import 'css-assets/layouts'
+// @import 'css-assets/grid'
+// @import 'css-assets/effects'
+// @import 'css-assets/icons'
 
-use('assets/root-selector.js')
-// is_function ?= utilus_is_function
-
-$(i=1)
-  rewindSelector(i)
-
-$$()
-  rootSelector()
-
-$$$()
-  root-selector()
-
--$(i=1)
-  rewind-selector(i)
-
-
-// //! --------------------
-// .block
-//   &:hover
-//     // test: $-$()
-//     // {$-$()}__element
-//     //   hl green
-//     .aaa
-//       // test: selector()
-//       {-$(2)}__element2
-//         hl red
-
-// .block
-//   &:hover
-//     {$$()}__element
-//       hl red
-//     &:active
-//       {$(2)}__element2
-//         hl green

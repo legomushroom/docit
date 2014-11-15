@@ -1,0 +1,36 @@
+.icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  fill: #bdbdbd;
+  display: block;
+  position: relative;
+/* f9478b0efe4b679e7d93ff6714fc849a */
+/* c0a851890861617e15db37a979ff4095 */
+/* 78466e66bbe30e3ca3fee109d95eb553 */
+}
+.icon.is-dribbble {
+  fill: #f942a8;
+}
+.icon.is-twitter {
+  fill: #00aeff;
+}
+.icon.is-facebook {
+  fill: #3b5998;
+}
+.icon:after {
+  content: '';
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.icon svg {
+  float: left;
+  width: 100%;
+  height: 100%;
+}
+.icon.is-hoverable:hover {
+  fill: #a1a1a1;
+  cursor: pointer;
+}

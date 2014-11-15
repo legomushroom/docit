@@ -1,20 +1,11 @@
-gs = 8px
-br = 3px
-PX = (1/16)em
-RX = (1/16)rem
+PX = (1/16)rem
+gs = 10*PX
+br = 3*PX
 
 baseLayer    = 0
 contentLayer = 10
 headerLayer  = 20
 modalLayer   = 30
-
-use('root-selector.js')
-
--$()
-  rewind-selector()
-
-$()
-  root-selector()
 
 easy-click()
   &:after
