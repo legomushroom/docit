@@ -1,0 +1,6 @@
+.post-actions-line(class="#{el.class || ''}", id="#{el.id || ''}")
+  a(href="#").is-hoverable-one.post-actions-line__text #{ el.text || '' }
+  - var likeCount   = el.likeCount || { class: 'like-count--check', count: '45k' }
+  - var icon        = el.icon || { path: 'share-icon', class: 'is-hoverable' }
+  - el = el.postActions || {}
+  include post-actions

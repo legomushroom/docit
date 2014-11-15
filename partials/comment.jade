@@ -1,0 +1,10 @@
+.comment(class="#{el.class || ''}", id="#{el.id || ''}")
+  - var name = el.name || ''
+  - var username = el.username || ''
+  - var text = el.text || ''
+  - el = el.postAvatar
+  include post-avatar
+  .comment__text-side
+    a(href="#").is-hoverable.comment__name #{name}
+    a(href="#").is-hoverable.comment__username #{username}
+    .comment__text #{text}

@@ -1,0 +1,7 @@
+.post-actions.grid(class="#{el.class || ''}", id="#{el.id || ''}")
+  .grid-bit.grid-bit--10-20
+    - el = likeCount || {}
+    include like-count
+  .post-actions__share-icon.grid-bit.grid-bit--10-20
+    - el = icon || {}
+    include icon

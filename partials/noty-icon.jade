@@ -1,0 +1,4 @@
+.noty-icon(class="#{el.class || ''}", id="#{el.id || ''}")
+	.noty-icon__count #{el.count || ''}
+	- el = el.icon
+	include icon

@@ -1,0 +1,10 @@
+.avatar-names(class="#{el.class || ''}", id="#{el.id || ''}")
+  - var name     = el.name
+  - var username = el.username
+  - el = postAvatar || {}
+  include post-avatar
+  .avatar-names__names
+    a.is-hoverable.avatar-names__name-bit.avatar-names__name-bit--name     #{name}
+    br
+    a.is-hoverable.avatar-names__name-bit.avatar-names__name-bit--username #{username}
+

@@ -1,0 +1,366 @@
+// BLOCKS
+@import '../assets/imports.styl'
+
+/* c7c4c8d282cd7c582b35edb9061a3735 */
+.header
+  background-color white
+  height 8*gs
+  border 1px solid transparent
+  position relative
+  position absolute
+  position fixed
+  z-index headerLayer
+  nw 0
+  width 100%
+  size = 3.5*gs
+  // transition background-color .2s linear
+  &:after
+    content ''
+    position absolute
+    top -1px
+    right 1.5*gs
+    background-color white
+    height 100%
+    width 16*gs - 3
+    z-index -1
+    opacity 1
+    cbox()
+    border-top 1px solid transparent
+    border-bottom 1px solid transparent
+    // transition opacity .2s linear
+    // transition-delay .2s
+  &.is-transparent
+    background-color transparent
+    z-index baseLayer
+    box-shadow none
+    .noty-icon
+      &__count
+        background-color c-bg
+        // transition-duration .2s
+    &:after
+      opacity 0
+      // transition-duration 0
+      // transition-delay 0
+    &.is-dropdown
+      .noty-icon
+        &__count
+          background-color white
+          // transition-duration 0
+      &:after
+        opacity 1
+        box-shadow gs gs 0 rgba(c-grey1,.1)
+
+
+  &__main-logo
+    display block
+    rect size
+    center size
+    left 2*gs
+    margin-left 0
+    &:hover
+      cursor pointer
+      opacity .75
+    .icon
+      rect 100%
+  .noty-icon
+    float right
+    margin-top 2*gs
+    margin-right 1.5*gs
+    z-index 1
+    position relative
+    // &__count
+    //   transition background-color .2s linear
+
+  .user-arrow-avatar
+    float right
+    margin-top   1.25*gs
+    margin-right 3*gs
+    z-index 1
+    position relative
+
+  .dropdown
+    position absolute
+    right 1.5*gs
+    top 100%
+    margin-top 1px
+    border-top 2px solid c-grey6
+
+/* 9552ced68e88c8d8b0eaa34601f69b8c */
+.dropdown
+  background-color white
+  border-radius br
+  padding 2*gs 0
+  &__item
+    padding gs 4*gs
+    font-size 14px
+    text-align left
+    &:hover
+      cursor pointer
+      background-color c-grey7
+
+  &--slice-top
+    border-top-left-radius  0
+    border-top-right-radius 0
+      
+
+/* 37bed26a5c6167c4513ce9e135b4b97e */
+.user-arrow-avatar
+  padding-left 3*gs
+  position relative
+  &:hover
+    cursor pointer
+    &:after
+      border-top-color c-grey3
+
+  &:after
+    content ''
+    position absolute
+    rect 0
+    left (gs)+2
+    top  2.25*gs
+    border (gs/2)+1 solid transparent
+    border-top-color c-grey4
+
+
+/* c9ecbcca33093a711447e0bc5a594506 */
+.noty-icon
+  position relative
+  easy-click()
+  .icon
+    rect 3*gs
+    fill c-grey6
+  &:hover
+    cursor pointer
+    .icon
+      fill c-grey5
+  &__count
+    position absolute
+    top -(gs/2) + 1
+    left 1.75*gs 
+    z-index 1
+    font-size 10px
+    color c-red1
+    // color c-grey2
+    background-color white
+    padding 2px
+    border-radius br
+    display none
+  &--check
+    .icon
+      fill c-red1
+    {$()}__count
+      display block
+    &:hover
+      .icon
+        fill c-red1-hover
+      {$()}__count
+        color c-red1-hover
+    
+
+/* 813e7295f2155af802dd28a0ec111767 */
+height = 5.5*gs
+.load-more-posts
+  height height
+  line-height height - 2px
+  background-color white
+  border-radius br
+  text-align center
+  font-size 14px
+  color c-grey4
+  &:hover
+    cursor pointer
+    background-color lighten(c-grey7, 3)
+
+postSidesPad = 5*gs
+/* 03baddbb430f0a1c1e2aedf37ccf06fb */
+.post
+  background-color white
+  width 600px
+  border-radius br
+  &__top
+    padding 3.5*gs postSidesPad
+    padding-right 15*gs
+    padding-bottom 2*gs
+    position relative
+  .post-source
+    float right
+    position absolute
+    right 5*gs
+    top 4*gs
+  &__text
+    color c-grey1
+    font-weight 100
+    font-size 20px
+    line-height 3.5*gs
+    margin-top 2*gs
+  &__media
+    // max-height 300px
+    // background-color black
+    text-align center
+    overflow hidden
+    img
+      max-width 600px
+      height auto
+    video
+      width 100%
+  .post-actions-line
+    padding 2*gs postSidesPad
+    margin-left - gs
+
+  &__comments
+    height 0
+    overflow hidden
+    .comment
+      padding-top 2*gs
+      &:first-of-type
+        padding-top 3*gs
+        border-top 2px solid c-grey7
+
+  &__open
+    height 3*gs
+    position relative
+    size = 5px
+    &:after
+      content ''
+      rect 0
+      center size
+      border size solid transparent
+      border-top-color c-grey5
+
+    &:hover
+      cursor pointer
+      background-color c-almost-grey7
+      &:after
+        border-top-color c-grey4
+
+  &__textarea
+    margin 3.5*gs 0 0*gs
+    height 7*gs
+
+  &--open
+    {$()}__comments
+      padding 0 postSidesPad 2*gs
+      height auto
+    {$()}__open
+      &:after
+        transform rotate(180deg) translateY(gs/2 + 2)
+    //   display none
+
+
+/* a5ead6e6d02c33dcde7d92d4375386b8 */
+.comment
+  .post-avatar
+    float left
+  &__text-side
+    margin-left 7*gs
+    font-size 14px
+    color c-grey1
+  &__name
+    font-weight 600
+    color c-grey1
+    margin-top (gs/2)
+  &__username
+    font-size 10px
+    color c-grey5
+    margin-left gs
+  &__text
+    margin-top .25*gs
+    line-height 20px
+    
+
+/* 77473e14bf935dc1a77122d5bc59d729 */
+.post-actions-line
+  &__text
+    float right
+    font-size 14px
+    color c-grey4
+    margin-top gs - 2px
+
+/* c306d24799f4810b25ffb22afcf7ffeb */
+.post-actions
+  width 13*gs
+  &__share-icon
+    .icon
+      rect 3*gs
+
+/* aac98fd8a8d242c7a398f1360f80916d */
+.like-count
+  position relative
+  display inline-block
+  padding-right (gs/2)
+  &:hover
+    cursor pointer
+    .icon
+      fill c-grey5
+  .icon
+    rect 3*gs
+    fill c-grey6
+  &__count
+    font-size 9px
+    color c-grey3
+    display inline-block
+    position absolute
+    left 85%
+    bottom 1px
+    border-radius br
+  &--check
+    &:hover
+      .icon
+        fill c-red1-hover
+    .icon
+      fill c-red1
+    {$()}__count
+      color c-red1
+      
+/* f9478b0efe4b679e7d93ff6714fc849a */
+.post-source
+  circle 7*gs
+  position relative
+  display block
+  border 1px solid transparent
+  .icon
+    center(4*gs)
+  /* a3ec64f4f5067fc1728d86edc2f097cd */
+  &--hoverable
+    &:hover
+      cursor pointer
+      border-color c-grey7
+
+/* 4f5ec690ca58ca5e9faa2f83b9c790cd */
+.avatar-names
+  clearfix()
+  .post-avatar
+    float left
+  &__names
+    margin-left 9.5*gs
+  &__name-bit
+    display inline-block
+    color c-grey1
+    // max-width 100%
+    // textel()
+    &--name
+      font-size 20px
+      margin-top gs
+      // padding-bottom 2px
+    &--username
+      font-size 12px
+      // margin-top 1.5*gs - 2px
+      margin-top 1.5*gs
+      padding-bottom 2px
+
+/* 746ecf9c9cd1fa3310f786a3cfba24b2 */
+.post-avatar
+  rect 8*gs
+  border-radius br
+  background-image url('http://is.gd/6YENHM')
+  background-color c-grey1
+  background-size 100% auto
+  overflow hidden
+  display block
+  /* a32632912711062cb3bae59dd231edcc */
+  &--x5
+    rect 5*gs
+  /* 0eb0b15a2e7d3f7e3eb23eb3834d7c71 */
+  &--circle
+    border-radius 50%
+
