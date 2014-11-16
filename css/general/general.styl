@@ -6,7 +6,8 @@
 
 
 html
-  font-size 16px
+  font-size   16px
+  line-height 200.5px
   
 body, html
   min-height 100%
@@ -14,11 +15,9 @@ body, html
   padding 0
 
 body
-  min-height 100%
   font-family 'Open Sans'
   background-color c-bg
   color c-grey1
-
 
 ::selection
   background-color c-red1
@@ -29,8 +28,6 @@ body
   background-color c-red1
   color white
   text-shadow none
-  
-
 
 // FONT
 .bold-g, .b-g
@@ -42,7 +39,6 @@ body
 .op-5-g
   opacity .5
 
-    
 .float-left-g,  .f-l-g
   float left
 .float-right-g, .f-r-g
@@ -52,7 +48,6 @@ body
   display none
 .h-g-i
   display none II
-
 .hl-g
   hl c-grey6
 
@@ -92,9 +87,8 @@ metrics()
         .{property}{prop}-x{i}-g, .{short[j]}{shortSide[x]}-x{i}-g
           {property}{prop} i*gs
 
-
 colors()
-  colors    =     c-red1   c-red2   c-green1    c-blue1   c-facebook    c-grey1   c-grey2   c-grey3   c-grey4   c-grey5    c-grey6  c-grey7  c-grey8  c-grey9  c-grey10
+  colors      =   c-red1   c-red2    c-green1   c-blue1   c-facebook    c-grey1   c-grey2   c-grey3   c-grey4   c-grey5   c-grey6    c-grey7   c-grey8   c-grey9   c-grey10
   colorsNames =  'c-red1' 'c-red2'  'c-green1' 'c-blue1' 'c-facebook'  'c-grey1' 'c-grey2' 'c-grey3' 'c-grey4' 'c-grey5' 'c-grey6'  'c-grey7' 'c-grey8' 'c-grey9' 'c-grey10'
   for color, i in colors
     .{colorsNames[i]}-bg-g

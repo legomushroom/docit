@@ -51,7 +51,7 @@ gulp.task('index:jade', function(e){
 
 gulp.task('default', function(){
   var server = livereload();
-  gulp.watch('css/main.styl',           ['stylus:main']);
+  gulp.watch(['css/main.styl', 'css/general/*.styl'], ['stylus:main']);
   gulp.watch('css/pages/*.styl',        ['stylus:pages']);
   gulp.watch('css/assets/kit.styl',     ['stylus:kit']);
   gulp.watch('index.jade',              ['index:jade']);

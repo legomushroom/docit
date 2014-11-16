@@ -131,6 +131,7 @@ table {
 }
 html {
   font-size: 16px;
+  line-height: 200.5px;
 }
 body,
 html {
@@ -139,7 +140,6 @@ html {
   padding: 0;
 }
 body {
-  min-height: 100%;
   font-family: 'Open Sans';
   background-color: #e6e6e6;
   color: #4d4d4d;
