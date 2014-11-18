@@ -41,6 +41,18 @@ gulp.task('stylus:kit', function(){
           .pipe(livereload())
 });
 
+gulp.task('coffee', function(){
+  return gulp.src('js/**/*.coffee')
+    .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+    .pipe(changed('js/', { extension: '.js'} ))
+    .pipe(coffeelint())
+    .pipe(coffeelint.reporter())
+    .pipe(coffeelint.reporter('fail'))
+    .pipe(coffee({bare: true}))
+    .pipe(gulp.dest('js/'))
+    .pipe(livereload())
+});
+
 gulp.task('index:jade', function(e){
   return gulp.src('index.jade')
           .pipe(plumber())
@@ -55,6 +67,7 @@ gulp.task('default', function(){
   gulp.watch('css/pages/*.styl',        ['stylus:pages']);
   gulp.watch('css/assets/kit.styl',     ['stylus:kit']);
   gulp.watch('index.jade',              ['index:jade']);
+  gulp.watch('js/**/*.coffee',          ['coffee']);
 });
 
 
