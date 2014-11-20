@@ -1,11 +1,16 @@
-# ROUTER
+class Router extends Backbone.Router
+  routes:
+    '/':           'indexRoute'
+    'colors':     'colorsRoute'
+    '*notFound':  '404Route'
 
-App.Router.map ->
-  @route('colors')
-  @route('icons')
-  # @resource 'lock', path: 'lock', -> console.log 'b'
+  constructor:()-> @bind('route', @change)
 
-App.ColorsRoute = Ember.Route.extend
-  model:->
-    console.log 'a'
-    {}
+  colorsRoute:->
+    console.log 'colors routes'
+
+  change:->
+    console.log 'change'
+
+window.DocIt ?= {}
+window.DocIt.Router = Router

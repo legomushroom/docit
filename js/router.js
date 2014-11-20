@@ -1,11 +1,34 @@
-App.Router.map(function() {
-  this.route('colors');
-  return this.route('icons');
-});
+var Router,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-App.ColorsRoute = Ember.Route.extend({
-  model: function() {
-    console.log('a');
-    return {};
+Router = (function(_super) {
+  __extends(Router, _super);
+
+  Router.prototype.routes = {
+    '/': 'indexRoute',
+    'colors': 'colorsRoute',
+    '*notFound': '404Route'
+  };
+
+  function Router() {
+    this.bind('route', this.change);
   }
-});
+
+  Router.prototype.colorsRoute = function() {
+    return console.log('colors routes');
+  };
+
+  Router.prototype.change = function() {
+    return console.log('change');
+  };
+
+  return Router;
+
+})(Backbone.Router);
+
+if (window.DocIt == null) {
+  window.DocIt = {};
+}
+
+window.DocIt.Router = Router;
