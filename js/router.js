@@ -12,8 +12,12 @@ Router = (function(_super) {
   };
 
   function Router() {
-    this.bind('route', this.change);
+    this.vars();
   }
+
+  Router.prototype.vars = function() {
+    return this.bind('route', this.change);
+  };
 
   Router.prototype.colorsRoute = function() {
     return console.log('colors routes');

@@ -11,7 +11,6 @@ App = (function() {
     this.$d = $(document);
     this.router = new window.DocIt.Router;
     Backbone.history.start();
-    console.log(this.router);
     return setTimeout((function(_this) {
       return function() {
         return _this.router.navigate('#/colors', {

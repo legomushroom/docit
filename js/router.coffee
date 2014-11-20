@@ -4,7 +4,10 @@ class Router extends Backbone.Router
     'colors':     'colorsRoute'
     '*notFound':  '404Route'
 
-  constructor:()-> @bind('route', @change)
+  constructor:()-> @vars()
+
+  vars:->
+    @bind('route', @change)
 
   colorsRoute:->
     console.log 'colors routes'

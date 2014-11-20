@@ -9,8 +9,6 @@ class App
     @router = new window.DocIt.Router
     Backbone.history.start()# pushState: true
 
-    console.log @router
-
     setTimeout =>
       @router.navigate '#/colors', trigger: true
     , 2000
