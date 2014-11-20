@@ -1,8 +1,9 @@
 App.Router.map(function() {
-  return this.route('lock');
+  this.route('colors');
+  return this.route('icons');
 });
 
-App.LockRoute = Ember.Route.extend({
+App.ColorsRoute = Ember.Route.extend({
   model: function() {
     console.log('a');
     return {};

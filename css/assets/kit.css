@@ -20,6 +20,9 @@ body {
   overflow: hidden;
   width: 3.125rem;
 }
+.k-hash:after {
+  content: attr(id);
+}
 .k-section {
   margin-left: 1.25rem;
 }
