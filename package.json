@@ -11,16 +11,7 @@
   "scripts": {
     "start": "nodemon app.js"
   },
-  "dependencies": {
-      "express": "4.4.1",
-      "jade": "latest",
-      "mongoose": "*",
-      "socket.io": "latest",
-      "request": "latest",
-      "fbgraph": "latest",
-      "node-promise": "latest",
-      "lodash": "latest"
-  },
+  "dependencies": {},
   "devDependencies": {
     "nodemon": "*",
     "gulp": "~3.8.10",
@@ -38,6 +29,6 @@
     "gulp-karma": "*",
     "gulp-concat": "*",
     "gulp-csslint": "*",
-    "nodemon": "*"
+    "bower": "latest"
   }
 }
