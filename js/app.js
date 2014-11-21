@@ -9,6 +9,18 @@ App = (function() {
 
   App.prototype.vars = function() {
     this.$d = $(document);
+    $.ajax({
+      dataType: 'json',
+      url: 'pages.json',
+      success: function(data) {
+        return console.log(data.pages);
+      },
+      error: function(data) {
+        var msg;
+        msg = 'can not get pages.json file, please rerun DocIt';
+        throw new Error("" + msg + " :: " + data.statusText);
+      }
+    });
     this.router = new window.DocIt.Router;
     Backbone.history.start();
     return setTimeout((function(_this) {

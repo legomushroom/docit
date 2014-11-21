@@ -6,6 +6,17 @@ class App
   vars:->
     @$d = $(document)
 
+    $.ajax
+      dataType: 'json',
+      url: 'pages.json',
+      success:(data)->
+        console.log data.pages
+      error:(data)->
+        msg = 'can not get pages.json file, please rerun DocIt'
+        throw new Error "#{msg} :: #{data.statusText}"
+
+
+
     @router = new window.DocIt.Router
     Backbone.history.start()# pushState: true
 

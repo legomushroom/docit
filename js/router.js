@@ -20,10 +20,6 @@ Router = (function(_super) {
     return this.on('route', this.change);
   };
 
-  Router.prototype.change = function() {
-    return console.log('change', this);
-  };
-
   return Router;
 
 })(Backbone.Router);

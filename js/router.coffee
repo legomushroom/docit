@@ -3,12 +3,10 @@ class Router extends Backbone.Router
     '/':           'indexRoute'
     'colors':     'colorsRoute'
     '*notFound':  '404Route'
-
   constructor:-> super; @vars()
-
   vars:->   @on 'route', @change
 
-  change:-> console.log 'change', @
+  # change:-> console.log 'change', @
 
 window.DocIt ?= {}
 window.DocIt.Router = Router
