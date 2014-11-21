@@ -1272,6 +1272,7 @@
     // matched. Creating a new one sets its `routes` hash, if not set statically.
     var Router = Backbone.Router = function(options) {
         options || (options = {});
+        // console.log(this.routes);
         if (options.routes) this.routes = options.routes;
         this._bindRoutes();
         this.initialize.apply(this, arguments);
@@ -1333,6 +1334,7 @@
         _bindRoutes: function() {
             if (!this.routes) return;
             this.routes = _.result(this, 'routes');
+            // console.log(this.routes);
             var route, routes = _.keys(this.routes);
             while ((route = routes.pop()) != null) {
                 this.route(route, this.routes[route]);
@@ -1537,6 +1539,7 @@
         // returns `false`.
         loadUrl: function(fragment) {
             fragment = this.fragment = this.getFragment(fragment);
+            // console.log(this.handlers);
             return _.any(this.handlers, function(handler) {
                 if (handler.route.test(fragment)) {
                     handler.callback(fragment);

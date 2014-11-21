@@ -9,6 +9,7 @@ class App
     @router = new window.DocIt.Router
     Backbone.history.start()# pushState: true
 
+
     setTimeout =>
       @router.navigate '#/colors', trigger: true
     , 2000
@@ -35,7 +36,7 @@ class App
         return false
 
       e.preventDefault()
-      it.router.navigate href, trigger: true
+      it.router.navigate(href, {trigger: true})
 
 window.DocIt ?= {}
 window.DocIt.App = new App

@@ -12,11 +12,17 @@ Router = (function(_super) {
   };
 
   function Router() {
+    Router.__super__.constructor.apply(this, arguments);
     this.vars();
   }
 
   Router.prototype.vars = function() {
-    return this.bind('route', this.change);
+    this.on('color', function() {
+      return console.log('a');
+    });
+    return this.on('route', function() {
+      return console.info('route changed');
+    });
   };
 
   Router.prototype.colorsRoute = function() {
