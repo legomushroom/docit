@@ -63,6 +63,8 @@ class ProtoView extends Backbone.View
 
   teardown:-> @undelegateEvents(); @
 
-ProtoView
+window.DocIt ?= {}
+window.DocIt.views ?= {}
+window.DocIt.views.ProtoV = ProtoView
 
 
