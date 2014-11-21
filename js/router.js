@@ -17,20 +17,11 @@ Router = (function(_super) {
   }
 
   Router.prototype.vars = function() {
-    this.on('color', function() {
-      return console.log('a');
-    });
-    return this.on('route', function() {
-      return console.info('route changed');
-    });
-  };
-
-  Router.prototype.colorsRoute = function() {
-    return console.log('colors routes');
+    return this.on('route', this.change);
   };
 
   Router.prototype.change = function() {
-    return console.log('change');
+    return console.log('change', this);
   };
 
   return Router;
