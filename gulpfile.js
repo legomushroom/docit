@@ -61,12 +61,21 @@ gulp.task('index:jade', function(e){
           .pipe(livereload())
 });
 
+gulp.task('page-templates:jade', function(e){
+  return gulp.src('page-templates/**/*.jade')
+          .pipe(plumber())
+          .pipe(jade({pretty:true}))
+          .pipe(gulp.dest('page-templates/'))
+          .pipe(livereload())
+});
+
 gulp.task('default', function(){
   var server = livereload();
   gulp.watch(['css/main.styl', 'css/general/*.styl'], ['stylus:main']);
   gulp.watch('css/pages/*.styl',        ['stylus:pages']);
   gulp.watch('css/assets/kit.styl',     ['stylus:kit']);
   gulp.watch('index.jade',              ['index:jade']);
+  gulp.watch('page-templates/**/*.jade',['page-templates:jade']);
   gulp.watch('js/**/*.coffee',          ['coffee']);
 });
 

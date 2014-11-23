@@ -5,12 +5,6 @@ var Router,
 Router = (function(_super) {
   __extends(Router, _super);
 
-  Router.prototype.routes = {
-    '/': 'indexRoute',
-    'colors': 'colorsRoute',
-    '*notFound': '404Route'
-  };
-
   function Router() {
     Router.__super__.constructor.apply(this, arguments);
     this.vars();
@@ -18,6 +12,10 @@ Router = (function(_super) {
 
   Router.prototype.vars = function() {
     return this.on('route', this.change);
+  };
+
+  Router.prototype.change = function(route) {
+    return console.log(route);
   };
 
   return Router;

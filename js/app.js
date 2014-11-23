@@ -9,27 +9,34 @@ App = (function() {
 
   App.prototype.vars = function() {
     this.$d = $(document);
-    $.ajax({
+    return $.ajax({
       dataType: 'json',
       url: 'pages.json',
-      success: function(data) {
-        return console.log(data.pages);
-      },
+      success: (function(_this) {
+        return function(data) {
+          _this.router = new window.DocIt.Router({
+            routes: _this.createRoutes(data.pages)
+          });
+          return Backbone.history.start();
+        };
+      })(this),
       error: function(data) {
         var msg;
         msg = 'can not get pages.json file, please rerun DocIt';
         throw new Error("" + msg + " :: " + data.statusText);
       }
     });
-    this.router = new window.DocIt.Router;
-    Backbone.history.start();
-    return setTimeout((function(_this) {
-      return function() {
-        return _this.router.navigate('#/colors', {
-          trigger: true
-        });
-      };
-    })(this), 2000);
+  };
+
+  App.prototype.createRoutes = function(pages) {
+    var page, routes, _i, _len;
+    routes = {};
+    for (_i = 0, _len = pages.length; _i < _len; _i++) {
+      page = pages[_i];
+      routes[page] = page;
+    }
+    routes[''] = 'index';
+    return routes;
   };
 
   App.prototype.handleLinks = function() {

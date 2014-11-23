@@ -9,21 +9,19 @@ class App
     $.ajax
       dataType: 'json',
       url: 'pages.json',
-      success:(data)->
-        console.log data.pages
+      success:(data)=>
+        @router = new window.DocIt.Router routes: @createRoutes(data.pages)
+        Backbone.history.start()
       error:(data)->
         msg = 'can not get pages.json file, please rerun DocIt'
         throw new Error "#{msg} :: #{data.statusText}"
 
-
-
-    @router = new window.DocIt.Router
-    Backbone.history.start()# pushState: true
-
-
-    setTimeout =>
-      @router.navigate '#/colors', trigger: true
-    , 2000
+  createRoutes:(pages)->
+    routes = {}
+    for page in pages
+      routes[page] = page
+    routes[''] = 'index'
+    routes
 
   handleLinks:->
     it = @
