@@ -1,10 +1,10 @@
-class ColorsPageView extends ProtoPage
-    # template: '#js-about-page-template'
-    title:    'DockIt - Colors'
-    name:     'colors'
+# class ColorsPageView extends ProtoPage
+#     # template: '#js-about-page-template'
+#     title:    'DockIt - Colors'
+#     name:     'colors'
 
-  ColorsPageView
+#   ColorsPageView
 
-window.DocIt ?= {}
-window.DocIt.views ?= {}
-window.DocIt.views.ColorsPV = ColorsPageView
+# window.DocIt ?= {}
+# window.DocIt.views ?= {}
+# window.DocIt.views.ColorsPV = ColorsPageView

@@ -5,7 +5,6 @@ class App
 
   vars:->
     @$d = $(document)
-
     $.ajax
       dataType: 'json',
       url: 'pages.json',

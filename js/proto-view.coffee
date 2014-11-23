@@ -10,7 +10,7 @@ class ProtoView extends Backbone.View
 
   afterTemplate:->
     @stripTemplate()
-    @o.isInitRender and @render()
+    @isInitRender and @render()
     @inject and @injectScripts()
 
   vars:->
@@ -22,23 +22,22 @@ class ProtoView extends Backbone.View
     if !@Model and !@model
       @model = new Backbone.Model @o.data
 
-    @model.on 'destroy', @h.bind @teardown, @
+    @model.on 'destroy', @teardown.bind @
 
   parseTemplate:->
     if !@template
       @template = ''; return
 
-    if typeof @template is 'string'
-      @template = $(@template).text()
     if typeof @template is 'function'
       @template = @template()
 
     @template = $.trim @template
     firstChar = @template.charAt(0)
-    # debugger
     isId    = firstChar is '#'
     isClass = firstChar is '.'
     isHtml  = firstChar is '<'
+    if firstChar and isId or isClass or isHtml
+      @template = $(@template).text()
     if !isId and !isClass and !isHtml and firstChar
       dfr = new $.Deferred
       $('<div />').load @template, (text)=>

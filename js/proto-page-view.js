@@ -9,6 +9,12 @@ ProtoPageView = (function(_super) {
     return ProtoPageView.__super__.constructor.apply(this, arguments);
   }
 
+  ProtoPageView.prototype.vars = function() {
+    this.route = this.o.route;
+    this.template = "page-templates/" + this.route + ".html";
+    return ProtoPageView.__super__.vars.apply(this, arguments);
+  };
+
   return ProtoPageView;
 
 })(ProtoView);

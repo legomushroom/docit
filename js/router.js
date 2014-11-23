@@ -1,6 +1,8 @@
-var Router,
+var PageView, Router,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+PageView = window.DocIt.views.ProtoPageV;
 
 Router = (function(_super) {
   __extends(Router, _super);
@@ -15,7 +17,19 @@ Router = (function(_super) {
   };
 
   Router.prototype.change = function(route) {
-    return console.log(route);
+    var _ref;
+    console.log(route);
+    if (route === this.previousRoute) {
+      return;
+    }
+    if ((_ref = this.currentPage) != null) {
+      _ref.teardown();
+    }
+    this.currentPage = new PageView({
+      route: route,
+      el: $('#js-pages')[0]
+    });
+    return this.previousRoute = route;
   };
 
   return Router;

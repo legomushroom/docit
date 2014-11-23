@@ -24,7 +24,7 @@ ProtoView = (function(_super) {
 
   ProtoView.prototype.afterTemplate = function() {
     this.stripTemplate();
-    this.o.isInitRender && this.render();
+    this.isInitRender && this.render();
     return this.inject && this.injectScripts();
   };
 
@@ -37,7 +37,7 @@ ProtoView = (function(_super) {
     if (!this.Model && !this.model) {
       this.model = new Backbone.Model(this.o.data);
     }
-    return this.model.on('destroy', this.h.bind(this.teardown, this));
+    return this.model.on('destroy', this.teardown.bind(this));
   };
 
   ProtoView.prototype.parseTemplate = function() {
@@ -45,9 +45,6 @@ ProtoView = (function(_super) {
     if (!this.template) {
       this.template = '';
       return;
-    }
-    if (typeof this.template === 'string') {
-      this.template = $(this.template).text();
     }
     if (typeof this.template === 'function') {
       this.template = this.template();
@@ -57,6 +54,9 @@ ProtoView = (function(_super) {
     isId = firstChar === '#';
     isClass = firstChar === '.';
     isHtml = firstChar === '<';
+    if (firstChar && isId || isClass || isHtml) {
+      this.template = $(this.template).text();
+    }
     if (!isId && !isClass && !isHtml && firstChar) {
       dfr = new $.Deferred;
       $('<div />').load(this.template, (function(_this) {
