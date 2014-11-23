@@ -12,7 +12,19 @@ ProtoPageView = (function(_super) {
   ProtoPageView.prototype.vars = function() {
     this.route = this.o.route;
     this.template = "page-templates/" + this.route + ".html";
+    this.css = "css/pages/" + this.route + ".css";
+    this.loadCSS();
     return ProtoPageView.__super__.vars.apply(this, arguments);
+  };
+
+  ProtoPageView.prototype.loadCSS = function() {
+    var $link, id, rel;
+    id = "js-" + this.route + "-css";
+    if (!$("#" + id)[0]) {
+      rel = 'stylesheet';
+      $link = $("<link id='" + id + "' rel='" + rel + "' type='text/css' href='" + this.css + "'>");
+      return document.head.appendChild($link[0]);
+    }
   };
 
   return ProtoPageView;

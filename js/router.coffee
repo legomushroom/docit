@@ -6,7 +6,6 @@ class Router extends Backbone.Router
   vars:->   @on 'route', @change
 
   change:(route)->
-    console.log route
     return if route is @previousRoute
 
     @currentPage?.teardown()

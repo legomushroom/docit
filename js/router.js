@@ -18,7 +18,6 @@ Router = (function(_super) {
 
   Router.prototype.change = function(route) {
     var _ref;
-    console.log(route);
     if (route === this.previousRoute) {
       return;
     }
