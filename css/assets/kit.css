@@ -4,6 +4,56 @@ body {
   background: #e6e6e6;
   max-width: 62.5rem;
   padding: 2.5rem 0;
+  padding-top: 4.0625rem;
+}
+.k-header {
+  height: 4.0625rem;
+  background-color: #fff;
+  border-bottom-left-radius: 0.1875rem;
+  border-bottom-right-radius: 0.1875rem;
+  box-shadow: 0 0.25rem 0 rgba(0,0,0,0.2);
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+.k-header .k-main-logo-icon {
+  left: 1.25rem;
+  test: 1.5625rem;
+  position: absolute;
+  top: 50%;
+  margin-top: -0.78125rem;
+}
+.k-header .k-main-logo-icon .icon {
+  width: 1.5625rem;
+  height: 1.5625rem;
+}
+.k-header .k-menu-icon {
+  position: absolute;
+  top: 50%;
+  margin-top: -0.5rem;
+  right: 1.25rem;
+}
+.k-header .k-menu-icon:after {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  z-index: 1;
+  top: -50%;
+  left: -50%;
+}
+.k-header .k-menu-icon .icon {
+  width: 1rem;
+  height: 1rem;
+}
+.k-header .k-menu-icon:hover {
+  cursor: pointer;
+  opacity: 0.75;
+}
+.k-header .k-menu-icon:active {
+  cursor: pointer;
+  opacity: 1;
 }
 .k-hash {
   font-size: 12px;

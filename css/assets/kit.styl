@@ -1,13 +1,46 @@
 // KIT
 @import '../assets/imports.styl'
 
+headerHeight = 6.5*gs
 body
   margin 0 auto
   margin-bottom 20*gs
   background c-bg
   max-width 100*gs
   padding 4*gs 0
-
+  padding-top headerHeight
+  
+.k-header
+  height headerHeight
+  background-color white
+  border-bottom-left-radius  br
+  border-bottom-right-radius br
+  box-shadow 0 4*PX 0 rgba(0,0,0,.2)
+  position absolute
+  width 100%
+  nw 0
+  
+  iconSize = 2.5*gs
+  .k-main-logo-icon
+    left 2*gs
+    test iconSize
+    margin-center-v(iconSize)
+    .icon
+      rect iconSize
+  iconSize = 1.5*gs + PX
+  .k-menu-icon
+    margin-center-v(iconSize)
+    easy-click()
+    right 2*gs
+    .icon
+      rect iconSize
+    &:hover
+      cursor pointer
+      opacity .75
+    &:active
+      cursor pointer
+      opacity 1  
+      
 .k-hash
   font-size 12px
   color c-grey6
