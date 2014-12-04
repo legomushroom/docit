@@ -7,8 +7,17 @@ body
   margin-bottom 20*gs
   background c-bg
   max-width 100*gs
-  padding 4*gs 0
-  padding-top headerHeight
+  overflow hidden
+  
+.k-pages
+  overflow auto
+  rect 100%
+  position absolute
+  z-index baseLayer
+  margin-top headerHeight
+  padding 2*gs 8*gs
+  padding-left 32*gs
+  nw 0
   
 .k-header
   height headerHeight
@@ -17,12 +26,12 @@ body
   border-bottom-right-radius br
   box-shadow 0 4*PX 0 rgba(0,0,0,.2)
   position absolute
+  z-index headerLayer
   width 100%
   nw 0
-  
   iconSize = 2.5*gs
   .k-main-logo-icon
-    left 2*gs
+    left 3*gs
     test iconSize
     margin-center-v(iconSize)
     .icon
@@ -31,7 +40,7 @@ body
   .k-menu-icon
     margin-center-v(iconSize)
     easy-click()
-    right 2*gs
+    right 3*gs
     .icon
       rect iconSize
     &:hover
