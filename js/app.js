@@ -14,9 +14,12 @@ App = (function() {
       url: 'pages.json',
       success: (function(_this) {
         return function(data) {
+          _this.routes = _this.createRoutes(data.pages);
+          _this.createNavigation(_this.routes);
           _this.router = new window.DocIt.Router({
-            routes: _this.createRoutes(data.pages)
+            routes: _this.routes
           });
+          _this.router.app = _this;
           return Backbone.history.start();
         };
       })(this),
@@ -72,6 +75,15 @@ App = (function() {
       return it.router.navigate(href, {
         trigger: true
       });
+    });
+  };
+
+  App.prototype.createNavigation = function(routes) {
+    return this.navigation = new window.DocIt.views.NavigaionV({
+      el: $('#js-main-nav'),
+      data: {
+        links: routes
+      }
     });
   };
 

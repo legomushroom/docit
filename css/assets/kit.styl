@@ -12,8 +12,9 @@ body
   
 .k-nav
   position absolute
+  z-index navLayer
   left 6*gs
-  top headerHeight + 8*gs
+  top headerHeight + 6.5*gs
   color #B9B9B9
   font-size 12*PX
   margin-bottom 2*gs
@@ -27,9 +28,24 @@ body
   display block
   font-size 16*PX
   text-decoration none
-  
-  
-  
+  position relative
+  circleSize = 6*PX
+  &:before
+    content ''
+    position absolute
+    circle circleSize
+    background-color kc-dark-grey
+    margin-center-v(circleSize)
+    left -1.5*gs
+    opacity 0
+  &:hover
+    cursor pointer
+    &:before
+      opacity 1
+  &.is-check
+    cursor default
+    &:before
+      background-color c-green
 .k-pages
   overflow auto
   rect 100%
@@ -39,6 +55,7 @@ body
   margin-top headerHeight
   padding 2*gs 8*gs
   padding-left 32*gs
+  padding-top 9.5*gs 
   nw 0
   
 .k-header
@@ -46,7 +63,7 @@ body
   background-color white
   border-bottom-left-radius  br
   border-bottom-right-radius br
-  box-shadow 0 4*PX 0 rgba(0,0,0,.2)
+  box-shadow 0 3*PX 0 rgba(0,0,0,.1)
   position absolute
   z-index headerLayer
   width 100%

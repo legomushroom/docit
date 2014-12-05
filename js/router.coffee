@@ -1,8 +1,7 @@
 
 PageView = window.DocIt.views.ProtoPageV
 class Router extends Backbone.Router
-  constructor:->
-    super; @vars()
+  constructor:-> super; @vars()
   vars:->   @on 'route', @change
 
   change:(route)->
@@ -13,6 +12,7 @@ class Router extends Backbone.Router
       route: route
       el: $('#js-pages')[0]
 
+    @app.navigation.setChecked route
     @previousRoute = route
 
 window.DocIt ?= {}

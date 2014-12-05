@@ -28,6 +28,7 @@ Router = (function(_super) {
       route: route,
       el: $('#js-pages')[0]
     });
+    this.app.navigation.setChecked(route);
     return this.previousRoute = route;
   };
 

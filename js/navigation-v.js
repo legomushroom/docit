@@ -1,0 +1,24 @@
+var Nav,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Nav = (function(_super) {
+  __extends(Nav, _super);
+
+  function Nav() {
+    return Nav.__super__.constructor.apply(this, arguments);
+  }
+
+  Nav.prototype.template = '#js-navigation-item-template';
+
+  Nav.prototype.setChecked = function(route) {
+    this.$('.k-navigation-link').removeClass('is-check');
+    this.$(".js-nav-" + route).addClass('is-check');
+    return console.log(this.$(".js-nav-" + route)[0]);
+  };
+
+  return Nav;
+
+})(window.DocIt.views.ProtoV);
+
+window.DocIt.views.NavigaionV = Nav;

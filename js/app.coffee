@@ -9,7 +9,10 @@ class App
       dataType: 'json',
       url: 'pages.json',
       success:(data)=>
-        @router = new window.DocIt.Router routes: @createRoutes(data.pages)
+        @routes = @createRoutes(data.pages)
+        @createNavigation @routes
+        @router = new window.DocIt.Router routes: @routes
+        @router.app = @
         Backbone.history.start()
       error:(data)->
         msg = 'can not get pages.json file, please rerun DocIt'
@@ -45,6 +48,11 @@ class App
 
       e.preventDefault()
       it.router.navigate(href, {trigger: true})
+
+  createNavigation:(routes)->
+    @navigation = new window.DocIt.views.NavigaionV
+      el: $ '#js-main-nav'
+      data: links: routes
 
 window.DocIt ?= {}
 window.DocIt.App = new App
