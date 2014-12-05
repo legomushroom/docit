@@ -1,9 +1,30 @@
 body {
   margin: 0 auto;
   margin-bottom: 12.5rem;
-  background: #e6e6e6;
+  background: #f3f3f3;
   max-width: 62.5rem;
   overflow: hidden;
+}
+.k-nav {
+  position: absolute;
+  left: 3.75rem;
+  top: 9.0625rem;
+  color: #b9b9b9;
+  font-size: 0.75rem;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.125rem;
+}
+.k-nav .k-navigation-header {
+  margin-bottom: 1.5625rem;
+}
+.k-nav .k-navigation-link {
+  margin-bottom: 1.25rem;
+}
+.k-navigation-link {
+  color: #717479;
+  display: block;
+  font-size: 1rem;
+  text-decoration: none;
 }
 .k-pages {
   overflow: auto;

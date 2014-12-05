@@ -1,6 +1,7 @@
 // KIT
 @import '../assets/imports.styl'
 
+kc-dark-grey = #717479
 headerHeight = 6.5*gs
 body
   margin 0 auto
@@ -9,9 +10,30 @@ body
   max-width 100*gs
   overflow hidden
   
+.k-nav
+  position absolute
+  left 6*gs
+  top headerHeight + 8*gs
+  color #B9B9B9
+  font-size 12*PX
+  margin-bottom 2*gs
+  letter-spacing 2*PX
+  .k-navigation-header
+    margin-bottom 2.5*gs 
+  .k-navigation-link  
+    margin-bottom 2*gs
+.k-navigation-link
+  color kc-dark-grey
+  display block
+  font-size 16*PX
+  text-decoration none
+  
+  
+  
 .k-pages
   overflow auto
   rect 100%
+  // max-rect 100%
   position absolute
   z-index baseLayer
   margin-top headerHeight
