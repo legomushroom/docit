@@ -1,5 +1,5 @@
 {
   "pages": [
-    "icons", "colors", "ui-blocks"
+    "icons", "colors", "type", "buttons", "forms"
   ]
 }

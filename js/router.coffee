@@ -5,6 +5,13 @@ class Router extends Backbone.Router
   vars:->   @on 'route', @change
 
   change:(route)->
+    if route is 'index'
+      keys = Object.keys(@app.routes)
+      key = if keys[0] is 'index' then keys[1] else keys[0]
+      @previousRoute = key
+      @navigate "#/#{key}", trigger: true
+      return
+    
     return if route is @previousRoute
 
     @currentPage?.teardown()

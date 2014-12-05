@@ -27,6 +27,7 @@ body {
   font-size: 1rem;
   text-decoration: none;
   position: relative;
+  text-transform: capitalize;
 }
 .k-navigation-link:before {
   content: '';
@@ -52,6 +53,7 @@ body {
 }
 .k-navigation-link.is-check:before {
   background-color: #50e3c2;
+  opacity: 1;
 }
 .k-pages {
   overflow: auto;

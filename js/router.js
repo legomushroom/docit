@@ -17,7 +17,16 @@ Router = (function(_super) {
   };
 
   Router.prototype.change = function(route) {
-    var _ref;
+    var key, keys, _ref;
+    if (route === 'index') {
+      keys = Object.keys(this.app.routes);
+      key = keys[0] === 'index' ? keys[1] : keys[0];
+      this.previousRoute = key;
+      this.navigate("#/" + key, {
+        trigger: true
+      });
+      return;
+    }
     if (route === this.previousRoute) {
       return;
     }

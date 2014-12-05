@@ -13,8 +13,7 @@ Nav = (function(_super) {
 
   Nav.prototype.setChecked = function(route) {
     this.$('.k-navigation-link').removeClass('is-check');
-    this.$(".js-nav-" + route).addClass('is-check');
-    return console.log(this.$(".js-nav-" + route)[0]);
+    return this.$(".js-nav-" + route).addClass('is-check');
   };
 
   return Nav;
