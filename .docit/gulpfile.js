@@ -58,6 +58,17 @@ gulp.task('coffee', function(){
     .pipe(livereload())
 });
 
+// gulp.task('docit:coffee', function(){
+//   return gulp.src('docit.coffee')
+//     .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+//     // .pipe(coffeelint())
+//     // .pipe(coffeelint.reporter())
+//     // .pipe(coffeelint.reporter('fail'))
+//     .pipe(coffee({bare: true}))
+//     .pipe(gulp.dest(''))
+//     .pipe(livereload())
+// });
+
 gulp.task('index:jade', function(e){
   return gulp.src('index.jade')
           .pipe(plumber())
@@ -85,6 +96,7 @@ gulp.task('default', function(){
   gulp.watch('index.jade',              ['index:jade']);
   gulp.watch(htmlPagesFiles,            ['pages:jade']);
   gulp.watch('js/**/*.coffee',          ['coffee']);
+  // gulp.watch('docit.js',                ['docit:coffee']);
 });
 
 
