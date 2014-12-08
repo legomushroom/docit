@@ -11,7 +11,7 @@ App = (function() {
     this.$d = $(document);
     return $.ajax({
       dataType: 'json',
-      url: 'pages.json',
+      url: '.docit/pages.json',
       success: (function(_this) {
         return function(data) {
           _this.routes = _this.createRoutes(data.pages);

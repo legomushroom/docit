@@ -13,6 +13,11 @@ var plumber       = require('gulp-plumber');
 var karma         = require('gulp-karma');
 var concat        = require('gulp-concat');
 var csslint       = require('gulp-csslint');
+var debug         = require('gulp-debug'); 
+
+var htmlPagesPath = '../pages/';
+var htmlPagesFiles = htmlPagesPath + '*.jade';
+
 
 gulp.task('stylus:main', function(){
   return gulp.src('css/main.styl')
@@ -58,14 +63,17 @@ gulp.task('index:jade', function(e){
           .pipe(plumber())
           .pipe(jade({pretty:true}))
           .pipe(gulp.dest(''))
+          .pipe(gulp.dest('../'))
           .pipe(livereload())
 });
 
-gulp.task('page-templates:jade', function(e){
-  return gulp.src('page-templates/**/*.jade')
+gulp.task('pages:jade', function(e){
+  return gulp.src(htmlPagesFiles)
           .pipe(plumber())
+          .pipe(changed(htmlPagesPath, { extension: '.html'} ))
           .pipe(jade({pretty:true}))
-          .pipe(gulp.dest('page-templates/'))
+          .pipe(debug())
+          .pipe(gulp.dest(htmlPagesPath))
           .pipe(livereload())
 });
 
@@ -75,7 +83,7 @@ gulp.task('default', function(){
   gulp.watch('css/pages/*.styl',        ['stylus:pages']);
   gulp.watch('css/assets/kit.styl',     ['stylus:kit']);
   gulp.watch('index.jade',              ['index:jade']);
-  gulp.watch('page-templates/**/*.jade',['page-templates:jade']);
+  gulp.watch(htmlPagesFiles,            ['pages:jade']);
   gulp.watch('js/**/*.coffee',          ['coffee']);
 });
 

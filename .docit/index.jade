@@ -3,11 +3,11 @@ html
   head
     meta(charset='UTF-8')
     title docit
-    link(rel="stylesheet", type="text/css", href="css/main.css")
-    link(rel="stylesheet", type="text/css", href="css/assets/kit.css")
+    link(rel="stylesheet", type="text/css", href=".docit/css/main.css")
+    link(rel="stylesheet", type="text/css", href=".docit/css/assets/kit.css")
     //- link(rel="stylesheet", href="css-assets/font/stylesheet.css", type="text/css", charset="utf-8")
   body
-    include icons.svg
+    include ../icons.svg
     .k-header
       .k-main-logo-icon
         - el = { path: 'main-logo-icon', class: '', id: ''} 
@@ -35,18 +35,18 @@ html
       <% } %>
       <% }); %>
 
-    script(src="js/lib/jquery-2.1.1.js")
-    script(src="js/lib/lodash.underscore.js")
-    script(src="js/lib/backbone.js")
+    script(src=".docit/js/lib/jquery-2.1.1.js")
+    script(src=".docit/js/lib/lodash.underscore.js")
+    script(src=".docit/js/lib/backbone.js")
     
     //- VIEWS
-    script(src="js/proto-view.js")
-    script(src="js/proto-page-view.js")
-    script(src="js/navigation-v.js")
+    script(src=".docit/js/proto-view.js")
+    script(src=".docit/js/proto-page-view.js")
+    script(src=".docit/js/navigation-v.js")
 
-    script(src="js/router.js")
+    script(src=".docit/js/router.js")
 
-    script(src="js/app.js")
+    script(src=".docit/js/app.js")
 
 
 

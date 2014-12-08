@@ -11,7 +11,7 @@ ProtoPageView = (function(_super) {
 
   ProtoPageView.prototype.vars = function() {
     this.route = this.o.route;
-    this.template = "page-templates/" + this.route + ".html";
+    this.template = "pages/" + this.route + ".html";
     this.css = "css/pages/" + this.route + ".css";
     this.loadCSS();
     return ProtoPageView.__super__.vars.apply(this, arguments);

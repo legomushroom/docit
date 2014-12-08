@@ -1,17 +1,22 @@
 {
-  "name": "mateomatic-name",
-  "version": "0.0.0",
+  "name": "docit",
+  "version": "0.1.0",
   "license": "MIT",
   "author": {
     "name":   "LegoMushroom",
     "email":  "legomushroom@gmail.com",
     "url":    "http://legomushroom.com"
   },
-  "private": true,
+  "preferGlobal": true,
+  "bin": {
+    "docit": "docit.js"
+  },
   "scripts": {
     "start": "nodemon app.js"
   },
-  "dependencies": {},
+  "dependencies": {
+
+  },
   "devDependencies": {
     "nodemon": "*",
     "gulp": "~3.8.10",
@@ -26,6 +31,7 @@
     "gulp-watch": "*",
     "gulp-coffeelint": "*",
     "gulp-plumber": "*",
+    "gulp-debug": "*",
     "gulp-karma": "*",
     "gulp-concat": "*",
     "gulp-csslint": "*",

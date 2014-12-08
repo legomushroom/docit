@@ -7,7 +7,7 @@ class App
     @$d = $(document)
     $.ajax
       dataType: 'json',
-      url: 'pages.json',
+      url: '.docit/pages.json',
       success:(data)=>
         @routes = @createRoutes(data.pages)
         @createNavigation @routes
@@ -56,3 +56,6 @@ class App
 
 window.DocIt ?= {}
 window.DocIt.App = new App
+
+
+
