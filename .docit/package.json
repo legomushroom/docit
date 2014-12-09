@@ -7,6 +7,10 @@
     "email":  "legomushroom@gmail.com",
     "url":    "http://legomushroom.com"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/legomushroom/docit"
+  },
   "preferGlobal": true,
   "bin": {
     "docit": "docit.js"
@@ -15,7 +19,7 @@
     "start": "nodemon app.js"
   },
   "dependencies": {
-
+    "jade": "1.8.1"
   },
   "devDependencies": {
     "nodemon": "*",
