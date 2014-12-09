@@ -13,7 +13,9 @@ var plumber       = require('gulp-plumber');
 var karma         = require('gulp-karma');
 var concat        = require('gulp-concat');
 var csslint       = require('gulp-csslint');
-var debug         = require('gulp-debug'); 
+var debug         = require('gulp-debug');
+var runSequence   = require('gulp-run-sequence');
+var shell         = require('gulp-shell');
 
 var htmlPagesPath = '../docit-pages/';
 var htmlPagesFiles = htmlPagesPath + '*.jade';
@@ -58,16 +60,27 @@ gulp.task('coffee', function(){
     .pipe(livereload())
 });
 
-// gulp.task('docit:coffee', function(){
-//   return gulp.src('docit.coffee')
-//     .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
-//     // .pipe(coffeelint())
-//     // .pipe(coffeelint.reporter())
-//     // .pipe(coffeelint.reporter('fail'))
-//     .pipe(coffee({bare: true}))
-//     .pipe(gulp.dest(''))
-//     .pipe(livereload())
-// });
+gulp.task('docit:coffee', function(){
+  return gulp.src('docit.coffee')
+    .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+    .pipe(coffeelint())
+    .pipe(coffeelint.reporter())
+    .pipe(coffeelint.reporter('fail'))
+    .pipe(coffee({bare: true}))
+    .pipe(gulp.dest(''))
+});
+
+gulp.task('docit-concat', function(){
+  return gulp.src(['docit-header.js', 'docit.js'])
+    .pipe(concat('docit.js'))
+    .pipe(gulp.dest(''))
+    .pipe(shell('npm link'))
+    .pipe(livereload())
+});
+
+gulp.task('docit', function () {
+  runSequence('docit:coffee', 'docit-concat');
+});
 
 gulp.task('index:jade', function(e){
   return gulp.src('index.jade')
@@ -96,7 +109,7 @@ gulp.task('default', function(){
   gulp.watch('index.jade',              ['index:jade']);
   gulp.watch(htmlPagesFiles,            ['pages:jade']);
   gulp.watch('js/**/*.coffee',          ['coffee']);
-  // gulp.watch('docit.js',                ['docit:coffee']);
+  gulp.watch('docit.coffee',            ['docit']);
 });
 
 

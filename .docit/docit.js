@@ -1,49 +1,46 @@
 #!/usr/bin/env node
 
-var jade  = require('jade');
-var watch = require('watch');
-var gaze  = require('gaze');
+var concat, gaze, jade, pName, pagFiles, pagesFolder, splitFilePath, watch;
 
-var pName = 'docit';
-var pagesFolder = '../' + pName + '-pages/';
-var pagFiles    = pagesFolder + '**/*.jade'
+jade = require("jade");
 
-// Watch all .js files/dirs in process.cwd()
+watch = require("watch");
+
+gaze = require("gaze");
+
+concat = require("concat");
+
+pName = "docit";
+
+pagesFolder = "../" + pName + "-pages/";
+
+pagFiles = pagesFolder + "**/*.jade";
+
+splitFilePath = function(p) {
+  var fileName, path, pathArr, pathStr;
+  pathArr = p.split("/");
+  fileName = pathArr[pathArr.length - 1];
+  path = pathArr.slice(0, pathArr.length - 1);
+  pathStr = path.join("/") + "/";
+  return {
+    path: pathStr,
+    fileName: fileName
+  };
+};
+
 gaze(pagFiles, function(err, watcher) {
-  // Files have all started watching
-  // watcher === this
-
-  // Get all watched files
-  this.watched(function(watched) {
-    console.log(watched);
+  this.on("changed", function(filepath) {
+    var file;
+    file = splitFilePath(filepath);
+    console.log(file);
+    return console.log(filepath + " was changed");
   });
-
-  // On file changed
-  this.on('changed', function(filepath) {
-    console.log(filepath + ' was changed');
+  this.on("added", function(filepath) {
+    return console.log(filepath + " was added");
   });
-
-  // On file added
-  this.on('added', function(filepath) {
-    console.log(filepath + ' was added');
-  });
-
-  // On file deleted
-  this.on('deleted', function(filepath) {
-    console.log(filepath + ' was deleted');
-  });
-
-  // On changed/added/deleted
-  this.on('all', function(event, filepath) {
-    console.log(filepath + ' was ' + event);
-  });
-
-  // Get watched files with relative paths
-  this.relative(function(err, files) {
-    console.log(files);
+  return this.on("deleted", function(filepath) {
+    return console.log(filepath + " was deleted");
   });
 });
 
-
-
-console.log('it works');
+console.log("it works");

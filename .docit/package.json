@@ -19,6 +19,7 @@
     "start": "nodemon app.js"
   },
   "dependencies": {
+    "concat": "^1.0.0",
     "gaze": "^0.6.4",
     "jade": "1.8.1",
     "watch": "^0.13.0",
@@ -40,6 +41,8 @@
     "gulp-minify-css": "~0.3.0",
     "gulp-notify": "~0.5.1",
     "gulp-plumber": "*",
+    "gulp-run-sequence": "^0.3.2",
+    "gulp-shell": "^0.2.11",
     "gulp-stylus": "0.0.12",
     "gulp-watch": "*",
     "nodemon": "*"
