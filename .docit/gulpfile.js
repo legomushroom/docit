@@ -15,7 +15,7 @@ var concat        = require('gulp-concat');
 var csslint       = require('gulp-csslint');
 var debug         = require('gulp-debug'); 
 
-var htmlPagesPath = '../pages/';
+var htmlPagesPath = '../docit-pages/';
 var htmlPagesFiles = htmlPagesPath + '*.jade';
 
 
