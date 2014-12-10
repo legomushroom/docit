@@ -102,7 +102,7 @@ gulp.task('pages:jade', function(e){
 });
 
 gulp.task('default', function(){
-  var server = livereload();
+  var server = livereload(40000);
   gulp.watch(['css/main.styl', 'css/general/*.styl'], ['stylus:main']);
   gulp.watch('css/pages/*.styl',        ['stylus:pages']);
   gulp.watch('css/assets/kit.styl',     ['stylus:kit']);

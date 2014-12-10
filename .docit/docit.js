@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 
-var Main, gaze, jade, jf, livereload;
+var Main, fs, gaze, jade, jf, livereload;
 
-jade = require("jade");
+jade = require('jade');
 
-gaze = require("gaze");
+gaze = require('gaze');
 
 jf = require('jsonfile');
 
 livereload = require('livereload');
+
+fs = require('fs');
 
 Main = (function() {
   function Main(o) {
@@ -23,7 +25,7 @@ Main = (function() {
     this.pagesFolder = "../" + this.projectName + "-pages";
     this.pagFiles = "" + this.pagesFolder + "/**/*.jade";
     this.compilePage = this.compilePage.bind(this);
-    this.removePage = this.removePage.bind(this);
+    this.removePageFromMap = this.removePageFromMap.bind(this);
     return this.generateJSONMap = this.generateJSONMap.bind(this);
   };
 
@@ -37,8 +39,11 @@ Main = (function() {
     return gaze(this.pagFiles, function(err, watcher) {
       this.relative(it.generateJSONMap);
       this.on('changed', it.compilePage);
-      this.on('added', it.compilePage);
-      return this.on('deleted', it.removePage);
+      this.on('added', function(filepath) {
+        it.addPageToMap(filepath);
+        return it.compilePage(filepath);
+      });
+      return this.on('deleted', it.removePageFromMap);
     });
   };
 
@@ -51,11 +56,50 @@ Main = (function() {
     }
   };
 
-  Main.prototype.removePage = function(filepath) {};
+  Main.prototype.addPageToMap = function(filepath, isRefresh) {
+    var file, folder;
+    file = this.splitFilePath(filepath);
+    folder = this.getFolder(filepath);
+    if (folder === ("" + this.pagesFolder + "/partials/")) {
+      return;
+    }
+    this.map[folder].push(file.fileName);
+    return this.writeMap();
+  };
+
+  Main.prototype.removePageFromMap = function(filepath) {
+    var file, folder, newPages, pages;
+    file = this.splitFilePath(filepath);
+    folder = this.getFolder(filepath);
+    if (folder === ("" + this.pagesFolder + "/partials/")) {
+      return;
+    }
+    fs.unlink(filepath.replace('.jade', '.html'));
+    newPages = [];
+    pages = this.map[folder];
+    pages.forEach(function(page) {
+      if (page !== file.fileName) {
+        return newPages.push(page);
+      }
+    });
+    this.map[folder] = newPages;
+    return this.writeMap();
+  };
+
+  Main.prototype.writeMap = function() {
+    return jf.writeFile('pages.json', this.map, (function(_this) {
+      return function(err) {
+        if (err) {
+          return console.error('could not write to pages.json');
+        } else {
+          return _this.server.refresh('pages.json');
+        }
+      };
+    })(this));
+  };
 
   Main.prototype.generateJSONMap = function(err, files) {
-    var map;
-    map = {};
+    this.map = {};
     Object.keys(files).forEach((function(_this) {
       return function(key) {
         var folder, items;
@@ -72,14 +116,10 @@ Main = (function() {
             return items.push(item.replace('.jade', ''));
           }
         });
-        return map[folder] = items;
+        return _this.map[folder] = items;
       };
     })(this));
-    return jf.writeFile('pages.json', map, function(err) {
-      if (err) {
-        return console.error('could not write to pages.json');
-      }
-    });
+    return this.writeMap();
   };
 
   Main.prototype.isFolder = function(path) {
@@ -90,20 +130,25 @@ Main = (function() {
     var folder, pathArr;
     pathArr = path.split('/');
     folder = pathArr[pathArr.length - 2];
-    return folder;
+    if (folder === ("" + this.projectName + "-pages")) {
+      return 'pages';
+    } else {
+      return folder;
+    }
   };
 
   Main.prototype.splitFilePath = function(p) {
-    var extension, file, fileName, path, pathArr, pathStr;
+    var extension, file, fileName, path, pathArr, pathStr, regex;
     pathArr = p.split("/");
     fileName = pathArr[pathArr.length - 1];
     extension = fileName.split('.');
     extension = extension[extension.length - 1];
     path = pathArr.slice(0, pathArr.length - 1);
     pathStr = path.join("/") + "/";
+    regex = new RegExp("\." + extension, 'gi');
     return file = {
       path: pathStr,
-      fileName: fileName,
+      fileName: fileName.replace(regex, ''),
       extension: extension
     };
   };
