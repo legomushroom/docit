@@ -3,9 +3,6 @@ gaze = require 'gaze'
 jf   = require 'jsonfile'
 livereload = require('livereload')
 fs   = require 'fs'
-
-
-
 class Main
   constructor:(@o={})->
     @vars()
@@ -18,7 +15,7 @@ class Main
     @compilePage        = @compilePage.bind       @
     @removePageFromMap  = @removePageFromMap.bind @
     @generateJSONMap    = @generateJSONMap.bind   @
-  createLivereloadServer:-> @server = livereload.createServer()
+  createLivereloadServer:-> @server = livereload.createServer({ port: 41000})
   listenPages:->
     it = @
     gaze @pagFiles, (err, watcher) ->

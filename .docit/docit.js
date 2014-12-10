@@ -30,7 +30,9 @@ Main = (function() {
   };
 
   Main.prototype.createLivereloadServer = function() {
-    return this.server = livereload.createServer();
+    return this.server = livereload.createServer({
+      port: 41000
+    });
   };
 
   Main.prototype.listenPages = function() {

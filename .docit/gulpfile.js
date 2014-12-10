@@ -60,6 +60,20 @@ gulp.task('coffee', function(){
     .pipe(livereload())
 });
 
+
+gulp.task('spec:coffee', function(){
+  return gulp.src('spec/**/*.coffee')
+    .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+    .pipe(changed('js/', { extension: '.js'} ))
+    .pipe(coffeelint())
+    .pipe(coffeelint.reporter())
+    .pipe(coffeelint.reporter('fail'))
+    .pipe(coffee({bare: true}))
+    .pipe(gulp.dest('spec/'))
+    .pipe(shell('jasmine-node spec/docitSpec.coffee --coffee'))
+    .pipe(livereload())
+});
+
 gulp.task('docit:coffee', function(){
   return gulp.src('docit.coffee')
     .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
@@ -109,6 +123,7 @@ gulp.task('default', function(){
   gulp.watch('index.jade',              ['index:jade']);
   gulp.watch(htmlPagesFiles,            ['pages:jade']);
   gulp.watch('js/**/*.coffee',          ['coffee']);
+  gulp.watch('spec/**/*.coffee',        ['spec:coffee']);
   gulp.watch('docit.coffee',            ['docit']);
 });
 

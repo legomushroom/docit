@@ -2,7 +2,8 @@ class ProtoPageView extends ProtoView
 
   vars:->
     @route = @o.route
-    @template = "pages/#{@route}.html"
+    @projectName = 'docit'
+    @template = "#{@projectName}-pages/#{@route}.html"
     @css = "css/pages/#{@route}.css"
     @loadCSS()
     super
