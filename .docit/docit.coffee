@@ -1,10 +1,12 @@
 jade = require("jade")
 gaze = require("gaze")
 jf   = require('jsonfile')
+livereload = require('livereload')
 
 class Main
   constructor:(@o={})->
     @vars()
+    @createLivereloadServer()
     @listenPages()
   vars:->
     @projectName = "docit"
@@ -13,6 +15,8 @@ class Main
     @compilePage = @compilePage.bind @
     @removePage  = @removePage.bind @
     @generateJSONMap = @generateJSONMap.bind @
+  createLivereloadServer:->
+    @server = livereload.createServer()
   listenPages:->
     it = @
     gaze @pagFiles, (err, watcher) ->
@@ -25,6 +29,7 @@ class Main
     file = @splitFilePath(filepath)
     if !file.path.match /\/partials\//
       jade.renderFile(filepath)
+      @server.refresh(filepath)
 
   removePage:(filepath)->
 

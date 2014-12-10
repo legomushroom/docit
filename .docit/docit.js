@@ -1,4 +1,6 @@
-var Main, gaze, jade, jf;
+#!/usr/bin/env node
+
+var Main, gaze, jade, jf, livereload;
 
 jade = require("jade");
 
@@ -6,10 +8,13 @@ gaze = require("gaze");
 
 jf = require('jsonfile');
 
+livereload = require('livereload');
+
 Main = (function() {
   function Main(o) {
     this.o = o != null ? o : {};
     this.vars();
+    this.createLivereloadServer();
     this.listenPages();
   }
 
@@ -20,6 +25,10 @@ Main = (function() {
     this.compilePage = this.compilePage.bind(this);
     this.removePage = this.removePage.bind(this);
     return this.generateJSONMap = this.generateJSONMap.bind(this);
+  };
+
+  Main.prototype.createLivereloadServer = function() {
+    return this.server = livereload.createServer();
   };
 
   Main.prototype.listenPages = function() {
@@ -37,7 +46,8 @@ Main = (function() {
     var file;
     file = this.splitFilePath(filepath);
     if (!file.path.match(/\/partials\//)) {
-      return jade.renderFile(filepath);
+      jade.renderFile(filepath);
+      return this.server.refresh(filepath);
     }
   };
 
