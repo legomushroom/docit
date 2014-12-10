@@ -1,5 +1,9 @@
 {
   "pages": [
-    "icons", "colors", "type", "buttons", "forms"
+    "buttons",
+    "colors",
+    "forms",
+    "icons",
+    "type"
   ]
 }
