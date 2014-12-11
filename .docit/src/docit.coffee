@@ -3,11 +3,14 @@ gaze = require 'gaze'
 jf   = require 'jsonfile'
 livereload = require('livereload')
 fs   = require 'fs'
-class Main
+class DocIt
   constructor:(@o={})->
+    console.log 'docit init from ./src/'
     @vars()
-    @createLivereloadServer()
+    !@o.isLivereloadLess and @createLivereloadServer()
     @listenPages()
+    return @
+
   vars:->
     @projectName = "docit"
     @pagesFolder = "../#{@projectName}-pages"
@@ -15,7 +18,7 @@ class Main
     @compilePage        = @compilePage.bind       @
     @removePageFromMap  = @removePageFromMap.bind @
     @generateJSONMap    = @generateJSONMap.bind   @
-  createLivereloadServer:-> @server = livereload.createServer({ port: 41000})
+  createLivereloadServer:-> @server = livereload.createServer({ port: 41000 })
   listenPages:->
     it = @
     gaze @pagFiles, (err, watcher) ->
@@ -62,6 +65,7 @@ class Main
       else @server.refresh('pages.json')
 
   generateJSONMap:(err, files)->
+    console.log files
     @map = {}
     Object.keys(files).forEach (key)=>
       return if key is "#{@pagesFolder}/partials/"
@@ -94,6 +98,10 @@ class Main
       fileName:   fileName.replace regex, ''
       extension:  extension
 
-new Main
+  stop:->
+    
 
-console.log "it works"
+# new DocIt
+module.exports = DocIt
+
+

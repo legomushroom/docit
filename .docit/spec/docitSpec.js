@@ -1,13 +1,15 @@
-var ps, shell;
+var DocIt, docit;
 
 console.log('--------------------- Tests ---------------------');
 
-shell = require('shelljs/global');
+DocIt = require('../src/docit');
 
-ps = require('ps-node');
+docit = new DocIt({
+  isLivereloadLess: true
+});
 
-ps.lookup({
-  command: ''
-}, function(err, resultList) {
-  return console.log(resultList, err);
+describe('docit', function() {
+  return describe('initialization', function() {
+    return it('should create folders if needed', function() {});
+  });
 });

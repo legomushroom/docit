@@ -1,6 +1,4 @@
-#!/usr/bin/env node
-
-var Main, fs, gaze, jade, jf, livereload;
+var DocIt, fs, gaze, jade, jf, livereload;
 
 jade = require('jade');
 
@@ -12,15 +10,17 @@ livereload = require('livereload');
 
 fs = require('fs');
 
-Main = (function() {
-  function Main(o) {
+DocIt = (function() {
+  function DocIt(o) {
     this.o = o != null ? o : {};
+    console.log('docit init from ./src/');
     this.vars();
-    this.createLivereloadServer();
+    !this.o.isLivereloadLess && this.createLivereloadServer();
     this.listenPages();
+    return this;
   }
 
-  Main.prototype.vars = function() {
+  DocIt.prototype.vars = function() {
     this.projectName = "docit";
     this.pagesFolder = "../" + this.projectName + "-pages";
     this.pagFiles = "" + this.pagesFolder + "/**/*.jade";
@@ -29,13 +29,13 @@ Main = (function() {
     return this.generateJSONMap = this.generateJSONMap.bind(this);
   };
 
-  Main.prototype.createLivereloadServer = function() {
+  DocIt.prototype.createLivereloadServer = function() {
     return this.server = livereload.createServer({
       port: 41000
     });
   };
 
-  Main.prototype.listenPages = function() {
+  DocIt.prototype.listenPages = function() {
     var it;
     it = this;
     return gaze(this.pagFiles, function(err, watcher) {
@@ -49,7 +49,7 @@ Main = (function() {
     });
   };
 
-  Main.prototype.compilePage = function(filepath) {
+  DocIt.prototype.compilePage = function(filepath) {
     var file;
     file = this.splitFilePath(filepath);
     if (!file.path.match(/\/partials\//)) {
@@ -58,7 +58,7 @@ Main = (function() {
     }
   };
 
-  Main.prototype.addPageToMap = function(filepath, isRefresh) {
+  DocIt.prototype.addPageToMap = function(filepath, isRefresh) {
     var file, folder;
     file = this.splitFilePath(filepath);
     folder = this.getFolder(filepath);
@@ -69,7 +69,7 @@ Main = (function() {
     return this.writeMap();
   };
 
-  Main.prototype.removePageFromMap = function(filepath) {
+  DocIt.prototype.removePageFromMap = function(filepath) {
     var file, folder, newPages, pages;
     file = this.splitFilePath(filepath);
     folder = this.getFolder(filepath);
@@ -88,7 +88,7 @@ Main = (function() {
     return this.writeMap();
   };
 
-  Main.prototype.writeMap = function() {
+  DocIt.prototype.writeMap = function() {
     return jf.writeFile('pages.json', this.map, (function(_this) {
       return function(err) {
         if (err) {
@@ -100,7 +100,8 @@ Main = (function() {
     })(this));
   };
 
-  Main.prototype.generateJSONMap = function(err, files) {
+  DocIt.prototype.generateJSONMap = function(err, files) {
+    console.log(files);
     this.map = {};
     Object.keys(files).forEach((function(_this) {
       return function(key) {
@@ -124,11 +125,11 @@ Main = (function() {
     return this.writeMap();
   };
 
-  Main.prototype.isFolder = function(path) {
+  DocIt.prototype.isFolder = function(path) {
     return path.substr(path.length - 1) === '/';
   };
 
-  Main.prototype.getFolder = function(path) {
+  DocIt.prototype.getFolder = function(path) {
     var folder, pathArr;
     pathArr = path.split('/');
     folder = pathArr[pathArr.length - 2];
@@ -139,7 +140,7 @@ Main = (function() {
     }
   };
 
-  Main.prototype.splitFilePath = function(p) {
+  DocIt.prototype.splitFilePath = function(p) {
     var extension, file, fileName, path, pathArr, pathStr, regex;
     pathArr = p.split("/");
     fileName = pathArr[pathArr.length - 1];
@@ -155,10 +156,10 @@ Main = (function() {
     };
   };
 
-  return Main;
+  DocIt.prototype.stop = function() {};
+
+  return DocIt;
 
 })();
 
-new Main;
-
-console.log("it works");
+module.exports = DocIt;

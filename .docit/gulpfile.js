@@ -70,31 +70,31 @@ gulp.task('spec:coffee', function(){
     .pipe(coffeelint.reporter('fail'))
     .pipe(coffee({bare: true}))
     .pipe(gulp.dest('spec/'))
-    .pipe(shell('jasmine-node spec/docitSpec.coffee --coffee'))
+    .pipe(shell('jasmine-node spec/docitSpec.js'))
     .pipe(livereload())
 });
 
 gulp.task('docit:coffee', function(){
-  return gulp.src('docit.coffee')
+  return gulp.src('src/docit.coffee')
     .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
     .pipe(coffeelint())
     .pipe(coffeelint.reporter())
     .pipe(coffeelint.reporter('fail'))
     .pipe(coffee({bare: true}))
-    .pipe(gulp.dest(''))
+    .pipe(gulp.dest('src/'))
 });
 
-gulp.task('docit-concat', function(){
-  return gulp.src(['docit-header.js', 'docit.js'])
-    .pipe(concat('docit.js'))
-    .pipe(gulp.dest(''))
-    .pipe(shell('npm link'))
-    .pipe(livereload())
-});
+// gulp.task('docit-concat', function(){
+//   return gulp.src(['docit-header.js', 'docit.js'])
+//     .pipe(concat('docit.js'))
+//     .pipe(gulp.dest(''))
+//     .pipe(shell('npm link'))
+//     .pipe(livereload())
+// });
 
-gulp.task('docit', function () {
-  runSequence('docit:coffee', 'docit-concat');
-});
+// gulp.task('docit', function () {
+//   runSequence('docit:coffee', 'docit-concat');
+// });
 
 gulp.task('index:jade', function(e){
   return gulp.src('index.jade')
@@ -124,7 +124,7 @@ gulp.task('default', function(){
   gulp.watch(htmlPagesFiles,            ['pages:jade']);
   gulp.watch('js/**/*.coffee',          ['coffee']);
   gulp.watch('spec/**/*.coffee',        ['spec:coffee']);
-  gulp.watch('docit.coffee',            ['docit']);
+  gulp.watch('src/docit.coffee',        ['docit:coffee']);
 });
 
 
