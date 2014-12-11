@@ -5,7 +5,7 @@ livereload = require('livereload')
 fs   = require 'fs'
 class DocIt
   constructor:(@o={})->
-    console.log 'docit init from ./src/'
+    console.log 'docit init'
     @vars()
     !@o.isLivereloadLess and @createLivereloadServer()
     @listenPages()
@@ -65,7 +65,7 @@ class DocIt
       else @server.refresh('pages.json')
 
   generateJSONMap:(err, files)->
-    console.log files
+    # console.log files
     @map = {}
     Object.keys(files).forEach (key)=>
       return if key is "#{@pagesFolder}/partials/"

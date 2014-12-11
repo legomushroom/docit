@@ -64,13 +64,13 @@ gulp.task('coffee', function(){
 gulp.task('spec:coffee', function(){
   return gulp.src('spec/**/*.coffee')
     .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
-    .pipe(changed('js/', { extension: '.js'} ))
+    .pipe(changed('spec/', { extension: '.js'} ))
     .pipe(coffeelint())
     .pipe(coffeelint.reporter())
     .pipe(coffeelint.reporter('fail'))
     .pipe(coffee({bare: true}))
     .pipe(gulp.dest('spec/'))
-    .pipe(shell('jasmine-node spec/docitSpec.js'))
+    .pipe(shell('jasmine-node spec/docit-spec.js'))
     .pipe(livereload())
 });
 

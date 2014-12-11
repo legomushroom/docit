@@ -13,7 +13,7 @@ fs = require('fs');
 DocIt = (function() {
   function DocIt(o) {
     this.o = o != null ? o : {};
-    console.log('docit init from ./src/');
+    console.log('docit init');
     this.vars();
     !this.o.isLivereloadLess && this.createLivereloadServer();
     this.listenPages();
@@ -101,7 +101,6 @@ DocIt = (function() {
   };
 
   DocIt.prototype.generateJSONMap = function(err, files) {
-    console.log(files);
     this.map = {};
     Object.keys(files).forEach((function(_this) {
       return function(key) {
