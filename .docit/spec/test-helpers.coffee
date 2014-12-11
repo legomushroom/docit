@@ -6,6 +6,8 @@ class TestHelpers
   cleanProject:->
     rimraf.sync '../docit-pages', (err)-> console.log err
     rimraf.sync '../css', (err)-> console.log err
-    fs.unlink '../index.html'
+    items = fs.readdirSync '../'
+    if 'index.html' in items
+      fs.unlink '../index.html', (err)-> console.log err
 
 module.exports = new TestHelpers

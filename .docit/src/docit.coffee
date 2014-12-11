@@ -1,15 +1,30 @@
 jade = require 'jade'
 gaze = require 'gaze'
 jf   = require 'jsonfile'
-livereload = require('livereload')
 fs   = require 'fs'
+fse  = require 'fs-extra'
+shell = require 'shell'
+
+mkdirp     = require 'mkdirp'
+livereload = require 'livereload'
+
+shell      = require 'shelljs/global'
+
 class DocIt
   constructor:(@o={})->
-    console.log 'docit init'
     @vars()
+    @createFolders()
     !@o.isLivereloadLess and @createLivereloadServer()
     @listenPages()
     return @
+
+  createFolders:->
+    items = fs.readdirSync '../'
+    if !('css' in items)
+      fse.copySync './project-folders/css/', '../css'
+    if !("#{@projectName}-pages" in items)
+      fse.copySync './project-folders/docit-pages/', '../docit-pages'
+
 
   vars:->
     @projectName = "docit"

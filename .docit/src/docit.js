@@ -1,4 +1,5 @@
-var DocIt, fs, gaze, jade, jf, livereload;
+var DocIt, fs, fse, gaze, jade, jf, livereload, mkdirp, shell,
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 jade = require('jade');
 
@@ -6,19 +7,38 @@ gaze = require('gaze');
 
 jf = require('jsonfile');
 
+fs = require('fs');
+
+fse = require('fs-extra');
+
+shell = require('shell');
+
+mkdirp = require('mkdirp');
+
 livereload = require('livereload');
 
-fs = require('fs');
+shell = require('shelljs/global');
 
 DocIt = (function() {
   function DocIt(o) {
     this.o = o != null ? o : {};
-    console.log('docit init');
     this.vars();
+    this.createFolders();
     !this.o.isLivereloadLess && this.createLivereloadServer();
     this.listenPages();
     return this;
   }
+
+  DocIt.prototype.createFolders = function() {
+    var items, _ref;
+    items = fs.readdirSync('../');
+    if (!(__indexOf.call(items, 'css') >= 0)) {
+      fse.copySync('./project-folders/css/', '../css');
+    }
+    if (!(_ref = "" + this.projectName + "-pages", __indexOf.call(items, _ref) >= 0)) {
+      return fse.copySync('./project-folders/docit-pages/', '../docit-pages');
+    }
+  };
 
   DocIt.prototype.vars = function() {
     this.projectName = "docit";
