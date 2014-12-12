@@ -29,7 +29,7 @@ class DocIt
     @projectName = "docit"
     @pagesFolder = "#{@projectName}-pages"
     @pagFiles    = "#{@pagesFolder}/**/*.html"
-    @compilePage        = @compilePage.bind       @
+    # @compilePage        = @compilePage.bind       @
     @removePageFromMap  = @removePageFromMap.bind @
     @generateJSONMap    = @generateJSONMap.bind   @
   createLivereloadServer:-> @server = livereload.createServer({ port: 41000 })
@@ -40,39 +40,55 @@ class DocIt
       # @on 'changed', (filepath)->
       #   console.log filepath
       @on 'added',  (filepath)->
-        console.log 'aaa'
+        console.log 'add'
         it.addPageToMap filepath
         # it.compilePage  filepath
-      @on 'deleted', it.removePageFromMap
+      @on 'deleted', (filepath)->
+        console.log 'delete'
+        it.removePageFromMap filepath
+
+      @on 'renamed', (filepath, oldpath)->
+        if filepath.match /\.trash/gi
+          it.removePageFromMap oldpath
+        # console.log 'renamed', filepath, oldpath
+        # it.removePageFromMap filepath
+
+      # @on 'all', (e, filepath)->
+      #   console.log 'all', e, filepath
   
-  compilePage:(filepath)->
-    console.log filepath
-    file = @splitFilePath(filepath)
-    console.log file
-    if !file.path.match /\/partials\//
-      console.log 'yup'
-      jade.renderFile(filepath)
-      @server.refresh(filepath)
+  # compilePage:(filepath)->
+  #   console.log filepath
+  #   file = @splitFilePath(filepath)
+  #   console.log file
+  #   if !file.path.match /\/partials\//
+  #     console.log 'yup'
+  #     jade.renderFile(filepath)
+  #     @server.refresh(filepath)
 
   addPageToMap:(filepath, isRefresh)->
     file   = @splitFilePath filepath
     folder = @getFolder filepath
     return if folder is "#{@pagesFolder}/partials/"
 
-    @map[folder].push file.fileName
+    folder = @map[folder]; fileName = file.fileName
+    if fileName in folder then return
+    else folder.push fileName
     @writeMap()
 
   removePageFromMap:(filepath)->
+    console.log filepath
     file   = @splitFilePath filepath
     folder = @getFolder filepath
     return if folder is "#{@pagesFolder}/partials/"
 
-    fs.unlink filepath.replace('.jade', '.html')
+    # fs.unlink filepath.replace('.jade', '.html')
 
     newPages = []
     pages = @map[folder]
+    console.log pages
     pages.forEach (page)->
-      if page isnt file.fileName
+      fileName = file.fileName.replace '.html', ''
+      if page isnt fileName
         newPages.push page
 
     @map[folder] = newPages
@@ -84,7 +100,6 @@ class DocIt
       else @server.refresh('pages.json')
 
   generateJSONMap:(err, files)->
-    console.log files
     @map = {}
     Object.keys(files).forEach (key)=>
       return if key is "#{@pagesFolder}/partials/" or key is './'

@@ -43,7 +43,6 @@ DocIt = (function() {
     this.projectName = "docit";
     this.pagesFolder = "" + this.projectName + "-pages";
     this.pagFiles = "" + this.pagesFolder + "/**/*.html";
-    this.compilePage = this.compilePage.bind(this);
     this.removePageFromMap = this.removePageFromMap.bind(this);
     return this.generateJSONMap = this.generateJSONMap.bind(this);
   };
@@ -60,48 +59,53 @@ DocIt = (function() {
     return gaze(this.pagFiles, function(err, watcher) {
       this.relative(it.generateJSONMap);
       this.on('added', function(filepath) {
-        console.log('aaa');
+        console.log('add');
         return it.addPageToMap(filepath);
       });
-      return this.on('deleted', it.removePageFromMap);
+      this.on('deleted', function(filepath) {
+        console.log('delete');
+        return it.removePageFromMap(filepath);
+      });
+      return this.on('renamed', function(filepath, oldpath) {
+        if (filepath.match(/\.trash/gi)) {
+          return it.removePageFromMap(oldpath);
+        }
+      });
     });
   };
 
-  DocIt.prototype.compilePage = function(filepath) {
-    var file;
-    console.log(filepath);
-    file = this.splitFilePath(filepath);
-    console.log(file);
-    if (!file.path.match(/\/partials\//)) {
-      console.log('yup');
-      jade.renderFile(filepath);
-      return this.server.refresh(filepath);
-    }
-  };
-
   DocIt.prototype.addPageToMap = function(filepath, isRefresh) {
-    var file, folder;
+    var file, fileName, folder;
     file = this.splitFilePath(filepath);
     folder = this.getFolder(filepath);
     if (folder === ("" + this.pagesFolder + "/partials/")) {
       return;
     }
-    this.map[folder].push(file.fileName);
+    folder = this.map[folder];
+    fileName = file.fileName;
+    if (__indexOf.call(folder, fileName) >= 0) {
+      return;
+    } else {
+      folder.push(fileName);
+    }
     return this.writeMap();
   };
 
   DocIt.prototype.removePageFromMap = function(filepath) {
     var file, folder, newPages, pages;
+    console.log(filepath);
     file = this.splitFilePath(filepath);
     folder = this.getFolder(filepath);
     if (folder === ("" + this.pagesFolder + "/partials/")) {
       return;
     }
-    fs.unlink(filepath.replace('.jade', '.html'));
     newPages = [];
     pages = this.map[folder];
+    console.log(pages);
     pages.forEach(function(page) {
-      if (page !== file.fileName) {
+      var fileName;
+      fileName = file.fileName.replace('.html', '');
+      if (page !== fileName) {
         return newPages.push(page);
       }
     });
@@ -122,7 +126,6 @@ DocIt = (function() {
   };
 
   DocIt.prototype.generateJSONMap = function(err, files) {
-    console.log(files);
     this.map = {};
     Object.keys(files).forEach((function(_this) {
       return function(key) {
