@@ -6,7 +6,9 @@ fs          = require 'fs'
 jf          = require 'jsonfile'
 
 testHelpers.cleanProject()
-docit = new DocIt isLivereloadLess: true
+docit = new DocIt
+  isLivereloadLess: true
+  isDev: true
 
 describe 'docit', ->
   describe 'initialization', ->
@@ -23,13 +25,13 @@ describe 'docit', ->
       # expect('icon.jade'    in partialsFolder).toBe true
   describe 'compilation', ->
     it 'should write pages json map on html file change', ->
-      # jf.writeFileSync 'pages.json', { pages: [] }
-      fs.writeFileSync '../docit-pages/colors.jade', ''
+      jf.writeFileSync '../pages.json', { pages: [] }
+      fs.writeFileSync '../docit-pages/colors.html', ''
 
-      # pages = jf.readFileSync('./pages.json')
-      # console.log pages
+      pages = jf.readFileSync('../pages.json')
+      console.log pages
 
-      # expect(JSON.stringify(pages)).toBe('{"pages":["colors"]}')
+      expect(JSON.stringify(pages)).toBe('{"pages":["colors"]}')
 
 
 

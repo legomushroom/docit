@@ -14,7 +14,8 @@ jf = require('jsonfile');
 testHelpers.cleanProject();
 
 docit = new DocIt({
-  isLivereloadLess: true
+  isLivereloadLess: true,
+  isDev: true
 });
 
 describe('docit', function() {
@@ -28,7 +29,14 @@ describe('docit', function() {
   });
   return describe('compilation', function() {
     return it('should write pages json map on html file change', function() {
-      return fs.writeFileSync('../docit-pages/colors.jade', '');
+      var pages;
+      jf.writeFileSync('../pages.json', {
+        pages: []
+      });
+      fs.writeFileSync('../docit-pages/colors.html', '');
+      pages = jf.readFileSync('../pages.json');
+      console.log(pages);
+      return expect(JSON.stringify(pages)).toBe('{"pages":["colors"]}');
     });
   });
 });

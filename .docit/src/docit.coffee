@@ -13,29 +13,34 @@ shell      = require 'shelljs/global'
 class DocIt
   constructor:(@o={})->
     @vars()
-    # @createFolders()
+    @createFolders()
     !@o.isLivereloadLess and @createLivereloadServer()
     @listenPages()
     return @
 
   createFolders:->
-    items = fs.readdirSync '../'
+    nBaseurl = if @isDev then './' else '.docit/'
+    items = fs.readdirSync @baseUrl
     if !('css' in items)
-      fse.copySync './project-folders/css/', '../css'
+      fse.copySync "#{nBaseurl}project-folders/css/", "#{@baseUrl}css"
     if !("#{@projectName}-pages" in items)
-      fse.copySync './project-folders/docit-pages/', '../docit-pages'
+      fromDir = "#{nBaseurl}./project-folders/docit-pages/"
+      fse.copySync fromDir, "#{@baseUrl}docit-pages"
 
   vars:->
+    @isDev = @o.isDev
+    @baseUrl  = if @isDev then '../' else './'
     @projectName = "docit"
-    @pagesFolder = "#{@projectName}-pages"
-    @pagFiles    = "#{@pagesFolder}/**/*.html"
+    @pagesFolder = "#{@baseUrl}#{@projectName}-pages"
+    @pageFiles    = "#{@pagesFolder}/**/*.html"
     # @compilePage        = @compilePage.bind       @
     @removePageFromMap  = @removePageFromMap.bind @
     @generateJSONMap    = @generateJSONMap.bind   @
   createLivereloadServer:-> @server = livereload.createServer({ port: 41000 })
   listenPages:->
     it = @
-    gaze @pagFiles, (err, watcher) ->
+    gaze @pageFiles, (err, watcher) ->
+
       @relative it.generateJSONMap
       # @on 'changed', (filepath)->
       #   console.log filepath
@@ -44,7 +49,7 @@ class DocIt
         it.addPageToMap filepath
         # it.compilePage  filepath
       @on 'deleted', (filepath)->
-        console.log 'delete'
+        # console.log 'delete'
         it.removePageFromMap filepath
 
       @on 'renamed', (filepath, oldpath)->
@@ -55,8 +60,8 @@ class DocIt
         # console.log 'renamed', filepath, oldpath
         # it.removePageFromMap filepath
 
-      # @on 'all', (e, filepath)->
-      #   console.log 'all', e, filepath
+      @on 'all', (e, filepath)->
+        console.log 'all', e, filepath
   
   # compilePage:(filepath)->
   #   console.log filepath
@@ -89,7 +94,7 @@ class DocIt
     @writeMap()
 
   removePageFromMap:(filepath)->
-    console.log filepath
+    # console.log filepath
     file   = @splitFilePath filepath
     folder = @getFolder filepath
     return if folder is "#{@pagesFolder}/partials/"
@@ -98,7 +103,7 @@ class DocIt
 
     newPages = []
     pages = @map[folder]
-    console.log pages
+    # console.log pages
     pages.forEach (page)->
       fileName = file.fileName.replace '.html', ''
       if page isnt fileName
@@ -108,11 +113,12 @@ class DocIt
     @writeMap()
 
   writeMap:->
-    jf.writeFile 'pages.json', @map, (err)=>
+    jf.writeFile "#{@baseUrl}pages.json", @map, (err)=>
       if err then console.error 'could not write to pages.json'
       else @server.refresh('pages.json')
 
   generateJSONMap:(err, files)->
+    console.log files
     @map = {}
     Object.keys(files).forEach (key)=>
       return if key is "#{@pagesFolder}/partials/" or key is './'
