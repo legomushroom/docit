@@ -13,7 +13,7 @@ shell      = require 'shelljs/global'
 class DocIt
   constructor:(@o={})->
     @vars()
-    @createFolders()
+    # @createFolders()
     !@o.isLivereloadLess and @createLivereloadServer()
     @listenPages()
     return @
@@ -25,11 +25,10 @@ class DocIt
     if !("#{@projectName}-pages" in items)
       fse.copySync './project-folders/docit-pages/', '../docit-pages'
 
-
   vars:->
     @projectName = "docit"
-    @pagesFolder = "../#{@projectName}-pages"
-    @pagFiles    = "#{@pagesFolder}/**/*.jade"
+    @pagesFolder = "#{@projectName}-pages"
+    @pagFiles    = "#{@pagesFolder}/**/*.html"
     @compilePage        = @compilePage.bind       @
     @removePageFromMap  = @removePageFromMap.bind @
     @generateJSONMap    = @generateJSONMap.bind   @
@@ -38,15 +37,20 @@ class DocIt
     it = @
     gaze @pagFiles, (err, watcher) ->
       @relative it.generateJSONMap
-      @on 'changed', it.compilePage
+      # @on 'changed', (filepath)->
+      #   console.log filepath
       @on 'added',  (filepath)->
+        console.log 'aaa'
         it.addPageToMap filepath
-        it.compilePage  filepath
+        # it.compilePage  filepath
       @on 'deleted', it.removePageFromMap
   
   compilePage:(filepath)->
+    console.log filepath
     file = @splitFilePath(filepath)
+    console.log file
     if !file.path.match /\/partials\//
+      console.log 'yup'
       jade.renderFile(filepath)
       @server.refresh(filepath)
 
@@ -80,15 +84,15 @@ class DocIt
       else @server.refresh('pages.json')
 
   generateJSONMap:(err, files)->
-    # console.log files
+    console.log files
     @map = {}
     Object.keys(files).forEach (key)=>
-      return if key is "#{@pagesFolder}/partials/"
+      return if key is "#{@pagesFolder}/partials/" or key is './'
       folder = @getFolder key
       if folder is "#{@projectName}-pages" then folder = 'pages'
       items = []
       files[key].forEach (item)=>
-        if !@isFolder item then items.push item.replace('.jade', '')
+        if !@isFolder item then items.push item.replace('.html', '')
       @map[folder] = items
 
     @writeMap()

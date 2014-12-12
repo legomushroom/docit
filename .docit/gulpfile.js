@@ -121,7 +121,7 @@ gulp.task('default', function(){
   gulp.watch('css/pages/*.styl',        ['stylus:pages']);
   gulp.watch('css/assets/kit.styl',     ['stylus:kit']);
   gulp.watch('index.jade',              ['index:jade']);
-  gulp.watch(htmlPagesFiles,            ['pages:jade']);
+  // gulp.watch(htmlPagesFiles,            ['pages:jade']);
   gulp.watch('js/**/*.coffee',          ['coffee']);
   gulp.watch('spec/**/*.coffee',        ['spec:coffee']);
   gulp.watch('src/docit.coffee',        ['docit:coffee']);

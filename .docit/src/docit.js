@@ -23,7 +23,6 @@ DocIt = (function() {
   function DocIt(o) {
     this.o = o != null ? o : {};
     this.vars();
-    this.createFolders();
     !this.o.isLivereloadLess && this.createLivereloadServer();
     this.listenPages();
     return this;
@@ -42,8 +41,8 @@ DocIt = (function() {
 
   DocIt.prototype.vars = function() {
     this.projectName = "docit";
-    this.pagesFolder = "../" + this.projectName + "-pages";
-    this.pagFiles = "" + this.pagesFolder + "/**/*.jade";
+    this.pagesFolder = "" + this.projectName + "-pages";
+    this.pagFiles = "" + this.pagesFolder + "/**/*.html";
     this.compilePage = this.compilePage.bind(this);
     this.removePageFromMap = this.removePageFromMap.bind(this);
     return this.generateJSONMap = this.generateJSONMap.bind(this);
@@ -60,10 +59,9 @@ DocIt = (function() {
     it = this;
     return gaze(this.pagFiles, function(err, watcher) {
       this.relative(it.generateJSONMap);
-      this.on('changed', it.compilePage);
       this.on('added', function(filepath) {
-        it.addPageToMap(filepath);
-        return it.compilePage(filepath);
+        console.log('aaa');
+        return it.addPageToMap(filepath);
       });
       return this.on('deleted', it.removePageFromMap);
     });
@@ -71,8 +69,11 @@ DocIt = (function() {
 
   DocIt.prototype.compilePage = function(filepath) {
     var file;
+    console.log(filepath);
     file = this.splitFilePath(filepath);
+    console.log(file);
     if (!file.path.match(/\/partials\//)) {
+      console.log('yup');
       jade.renderFile(filepath);
       return this.server.refresh(filepath);
     }
@@ -121,11 +122,12 @@ DocIt = (function() {
   };
 
   DocIt.prototype.generateJSONMap = function(err, files) {
+    console.log(files);
     this.map = {};
     Object.keys(files).forEach((function(_this) {
       return function(key) {
         var folder, items;
-        if (key === ("" + _this.pagesFolder + "/partials/")) {
+        if (key === ("" + _this.pagesFolder + "/partials/") || key === './') {
           return;
         }
         folder = _this.getFolder(key);
@@ -135,7 +137,7 @@ DocIt = (function() {
         items = [];
         files[key].forEach(function(item) {
           if (!_this.isFolder(item)) {
-            return items.push(item.replace('.jade', ''));
+            return items.push(item.replace('.html', ''));
           }
         });
         return _this.map[folder] = items;
