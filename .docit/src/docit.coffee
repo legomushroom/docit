@@ -50,6 +50,8 @@ class DocIt
       @on 'renamed', (filepath, oldpath)->
         if filepath.match /\.trash/gi
           it.removePageFromMap oldpath
+        else it.renamePageInMap filepath, oldpath
+
         # console.log 'renamed', filepath, oldpath
         # it.removePageFromMap filepath
 
@@ -64,6 +66,17 @@ class DocIt
   #     console.log 'yup'
   #     jade.renderFile(filepath)
   #     @server.refresh(filepath)
+  renamePageInMap:(filepath, oldpath)->
+    newFile   = @splitFilePath filepath
+    newFolder = @getFolder filepath
+    oldFile   = @splitFilePath oldpath
+    oldFolder = @getFolder oldpath
+
+    folder = @map[oldFolder]
+    for page, i in folder
+      if page is oldFile.fileName
+        folder[i] = newFile.fileName
+    @writeMap()
 
   addPageToMap:(filepath, isRefresh)->
     file   = @splitFilePath filepath

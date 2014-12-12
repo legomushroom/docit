@@ -69,9 +69,27 @@ DocIt = (function() {
       return this.on('renamed', function(filepath, oldpath) {
         if (filepath.match(/\.trash/gi)) {
           return it.removePageFromMap(oldpath);
+        } else {
+          return it.renamePageInMap(filepath, oldpath);
         }
       });
     });
+  };
+
+  DocIt.prototype.renamePageInMap = function(filepath, oldpath) {
+    var folder, i, newFile, newFolder, oldFile, oldFolder, page, _i, _len;
+    newFile = this.splitFilePath(filepath);
+    newFolder = this.getFolder(filepath);
+    oldFile = this.splitFilePath(oldpath);
+    oldFolder = this.getFolder(oldpath);
+    folder = this.map[oldFolder];
+    for (i = _i = 0, _len = folder.length; _i < _len; i = ++_i) {
+      page = folder[i];
+      if (page === oldFile.fileName) {
+        folder[i] = newFile.fileName;
+      }
+    }
+    return this.writeMap();
   };
 
   DocIt.prototype.addPageToMap = function(filepath, isRefresh) {
