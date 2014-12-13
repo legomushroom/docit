@@ -32,6 +32,7 @@ DocIt = (function() {
   DocIt.prototype.createFolders = function() {
     var fromDir, items, nBaseurl, _ref;
     nBaseurl = this.isDev ? './' : '.docit/';
+    this.baseUrl = this.isDev ? '../' : './';
     items = fs.readdirSync(this.baseUrl);
     if (!(__indexOf.call(items, 'css') >= 0)) {
       fse.copySync("" + nBaseurl + "project-folders/css/", "" + this.baseUrl + "css");
@@ -44,9 +45,8 @@ DocIt = (function() {
 
   DocIt.prototype.vars = function() {
     this.isDev = this.o.isDev;
-    this.baseUrl = this.isDev ? '../' : './';
     this.projectName = "docit";
-    this.pagesFolder = "" + this.baseUrl + this.projectName + "-pages";
+    this.pagesFolder = "./" + this.projectName + "-pages";
     this.pageFiles = "" + this.pagesFolder + "/**/*.html";
     this.removePageFromMap = this.removePageFromMap.bind(this);
     return this.generateJSONMap = this.generateJSONMap.bind(this);
@@ -62,23 +62,26 @@ DocIt = (function() {
     var it;
     it = this;
     return gaze(this.pageFiles, function(err, watcher) {
-      this.relative(it.generateJSONMap);
-      this.on('added', function(filepath) {
-        console.log('add');
-        return it.addPageToMap(filepath);
-      });
-      this.on('deleted', function(filepath) {
-        return it.removePageFromMap(filepath);
-      });
+      this.relative((function(_this) {
+        return function(err, files) {
+          var map;
+          return map = _this.generateJSONMap(err, files);
+        };
+      })(this));
+      this.on('added', it.addPageToMap);
+      this.on('deleted', it.removePageFromMap);
       this.on('renamed', function(filepath, oldpath) {
         if (filepath.match(/\.trash/gi)) {
-          return it.removePageFromMap(oldpath);
+          it.removePageFromMap(oldpath);
         } else {
-          return it.renamePageInMap(filepath, oldpath);
+          it.renamePageInMap(filepath, oldpath);
+          watcher.close();
+          it.listenPages();
         }
+        return true;
       });
       return this.on('all', function(e, filepath) {
-        return console.log('all', e, filepath);
+        return console.log('all', e);
       });
     });
   };
@@ -96,7 +99,7 @@ DocIt = (function() {
         folder[i] = newFile.fileName;
       }
     }
-    return this.writeMap();
+    return this.writeMap(this.map);
   };
 
   DocIt.prototype.addPageToMap = function(filepath, isRefresh) {
@@ -113,7 +116,7 @@ DocIt = (function() {
     } else {
       folder.push(fileName);
     }
-    return this.writeMap();
+    return this.writeMap(this.map);
   };
 
   DocIt.prototype.removePageFromMap = function(filepath) {
@@ -133,11 +136,12 @@ DocIt = (function() {
       }
     });
     this.map[folder] = newPages;
-    return this.writeMap();
+    return this.writeMap(this.map);
   };
 
-  DocIt.prototype.writeMap = function() {
-    return jf.writeFile("" + this.baseUrl + "pages.json", this.map, (function(_this) {
+  DocIt.prototype.writeMap = function(map) {
+    this.map = map;
+    return jf.writeFile("./pages.json", map, (function(_this) {
       return function(err) {
         if (err) {
           return console.error('could not write to pages.json');
@@ -149,8 +153,8 @@ DocIt = (function() {
   };
 
   DocIt.prototype.generateJSONMap = function(err, files) {
-    console.log(files);
-    this.map = {};
+    var map;
+    map = {};
     Object.keys(files).forEach((function(_this) {
       return function(key) {
         var folder, items;
@@ -167,10 +171,10 @@ DocIt = (function() {
             return items.push(item.replace('.html', ''));
           }
         });
-        return _this.map[folder] = items;
+        return map[folder] = items;
       };
     })(this));
-    return this.writeMap();
+    return map;
   };
 
   DocIt.prototype.isFolder = function(path) {
