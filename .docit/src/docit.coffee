@@ -10,12 +10,15 @@ livereload = require 'livereload'
 
 shell      = require 'shelljs/global'
 
+recursive = require  'readdir-recursive'
+
 class DocIt
   constructor:(@o={})->
     @vars()
     @createFolders()
+    @getProjectFiles()
     !@o.isLivereloadLess and @createLivereloadServer()
-    @listenPages()
+    !@o.isDev and @listenPages()
     return @
   createFolders:->
     nBaseurl = if @isDev then './' else '.docit/'
@@ -26,20 +29,21 @@ class DocIt
     if !("#{@projectName}-pages" in items)
       fromDir = "#{nBaseurl}./project-folders/docit-pages/"
       fse.copySync fromDir, "#{@baseUrl}docit-pages"
+  getProjectFiles:->
+    files = recursive.fileSync '../docit-pages/'
+    map = @parseFolderToMap files
+    @writeMap map
   vars:->
     @isDev = @o.isDev
     @projectName = "docit"
     @pagesFolder = "./#{@projectName}-pages"
     @pageFiles    = "#{@pagesFolder}/**/*.html"
     @removePageFromMap  = @removePageFromMap.bind @
-    @generateJSONMap    = @generateJSONMap.bind   @
+
   createLivereloadServer:-> @server = livereload.createServer({ port: 41000 })
   listenPages:->
     it = @
     gaze @pageFiles, (err, watcher) ->
-      @relative (err,files)=>
-        map = it.generateJSONMap(err,files)
-        @writeMap map
       @on 'added',   (filepath)=>
         map = it.addPageToMap filepath: filepath, map: @map
         @writeMap map
@@ -53,6 +57,30 @@ class DocIt
         true
       @on 'all', (e, filepath)->
         console.log 'all', e
+
+  parseFolderToMap:(files)->
+    map = {}
+    for file, i in files
+      base = file.split('docit-pages/')[1]
+      filePathArr = base.split '/'
+      # if just a file name then
+      # put it in the "pages" folder
+      if filePathArr.length is 1
+        map['pages'] ?= []
+        map['pages'].push filePathArr[0].replace '.html', ''
+      else
+        # if file is inside another nested folder
+        # save this file to map as a sibling of "pages"
+        # folder but only if the folder name isnt "partials"
+        fileName = filePathArr[filePathArr.length-1].replace '.html', ''
+        filePathArr = filePathArr.slice(0, filePathArr.length-1)
+        if filePathArr.length > 1
+          console.warn "only one level of
+             nesting allowed: \"#{filePathArr[1]}\" would be ignored"
+        if (folderName = filePathArr[0]) isnt 'partials'
+          map[folderName] ?= []
+          map[folderName].push fileName
+    map
   # compilePage:(filepath)->
   #   console.log filepath
   #   file = @splitFilePath(filepath)
@@ -97,22 +125,9 @@ class DocIt
     map
   writeMap:(map)->
     @map = map
-    jf.writeFile "./pages.json", map, (err)=>
-      if err then console.error 'could not write to pages.json'
-      else @server.refresh('pages.json')
+    jf.writeFileSync "./pages.json", map
+    @server?.refresh('./pages.json')
 
-  generateJSONMap:(err, files)->
-    map = {}
-    Object.keys(files).forEach (key)=>
-      return if key is "#{@pagesFolder}/partials/" or key is './'
-      folder = @getFolder key
-      if folder is "#{@projectName}-pages" then folder = 'pages'
-      items = []
-      files[key].forEach (item)=>
-        if !@isFolder item then items.push item.replace('.html', '')
-      map[folder] = items
-    map
-    # @writeMap()
   isFolder:(path)-> path.substr(path.length-1) is '/'
   getFolder:(path)->
     pathArr = path.split '/'

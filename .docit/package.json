@@ -25,6 +25,8 @@
     "jade": "1.8.1",
     "jsonfile": "^2.0.0",
     "livereload": "^0.3.4",
+    "readdir-recursive": "0.0.4",
+    "recursive-readdir": "^1.2.0",
     "watch": "^0.13.0",
     "watchr": "^2.4.11"
   },
