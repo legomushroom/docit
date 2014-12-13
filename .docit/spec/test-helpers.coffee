@@ -10,4 +10,7 @@ class TestHelpers
     if 'index.html' in items
       fs.unlink '../index.html', (err)-> console.log err
 
+    if 'pages.json' in items
+      fs.unlink '../pages.json', (err)-> console.log err
+
 module.exports = new TestHelpers

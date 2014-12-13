@@ -38,13 +38,15 @@ class DocIt
     it = @
     gaze @pageFiles, (err, watcher) ->
       @relative (err,files)=>
-        map = @generateJSONMap(err,files)
-
-      @on 'added',   it.addPageToMap
+        map = it.generateJSONMap(err,files)
+        @writeMap map
+      @on 'added',   (filepath)=>
+        map = it.addPageToMap filepath: filepath, map: @map
+        @writeMap map
       @on 'deleted', it.removePageFromMap
       @on 'renamed', (filepath, oldpath)->
         if filepath.match /\.trash/gi
-          it.removePageFromMap oldpath
+          @writeMap it.removePageFromMap filepath: oldpath, map: @map
         else
           it.renamePageInMap filepath, oldpath
           watcher.close(); it.listenPages()
@@ -59,36 +61,40 @@ class DocIt
   #     console.log 'yup'
   #     jade.renderFile(filepath)
   #     @server.refresh(filepath)
-  renamePageInMap:(filepath, oldpath)->
-    newFile   = @splitFilePath filepath
-    newFolder = @getFolder filepath
-    oldFile   = @splitFilePath oldpath
-    oldFolder = @getFolder oldpath
-    folder = @map[oldFolder]
+  renamePageInMap:(o)->
+    newFilePath = o.newPath; oldFilePath = o.oldPath; map = o.map
+    newFile   = @splitFilePath newFilePath
+    newFolder = @getFolder newFilePath
+    oldFile   = @splitFilePath oldFilePath
+    oldFolder = @getFolder oldFilePath
+    folder = map[oldFolder]
     for page, i in folder
       if page is oldFile.fileName
         folder[i] = newFile.fileName
-    @writeMap @map
-  addPageToMap:(filepath, isRefresh)->
+    # @writeMap @map
+    map
+  addPageToMap:(o)->
+    map = o.map; filepath = o.filepath
     file   = @splitFilePath filepath
     folder = @getFolder filepath
     return if folder is "#{@pagesFolder}/partials/"
-    folder = @map[folder]; fileName = file.fileName
+    folder = map[folder]; fileName = file.fileName
     if fileName in folder then return
     else folder.push fileName
-    @writeMap @map
-  removePageFromMap:(filepath)->
+    map
+  removePageFromMap:(o)->
+    map = o.map; filepath = o.filepath
     file   = @splitFilePath filepath
     folder = @getFolder filepath
     return if folder is "#{@pagesFolder}/partials/"
     newPages = []
-    pages = @map[folder]
+    pages = map[folder]
     pages.forEach (page)->
       fileName = file.fileName.replace '.html', ''
       if page isnt fileName
         newPages.push page
-    @map[folder] = newPages
-    @writeMap @map
+    map[folder] = newPages
+    map
   writeMap:(map)->
     @map = map
     jf.writeFile "./pages.json", map, (err)=>

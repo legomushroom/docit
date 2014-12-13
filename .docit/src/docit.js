@@ -65,14 +65,27 @@ DocIt = (function() {
       this.relative((function(_this) {
         return function(err, files) {
           var map;
-          return map = _this.generateJSONMap(err, files);
+          map = it.generateJSONMap(err, files);
+          return _this.writeMap(map);
         };
       })(this));
-      this.on('added', it.addPageToMap);
+      this.on('added', (function(_this) {
+        return function(filepath) {
+          var map;
+          map = it.addPageToMap({
+            filepath: filepath,
+            map: _this.map
+          });
+          return _this.writeMap(map);
+        };
+      })(this));
       this.on('deleted', it.removePageFromMap);
       this.on('renamed', function(filepath, oldpath) {
         if (filepath.match(/\.trash/gi)) {
-          it.removePageFromMap(oldpath);
+          this.writeMap(it.removePageFromMap({
+            filepath: oldpath,
+            map: this.map
+          }));
         } else {
           it.renamePageInMap(filepath, oldpath);
           watcher.close();
@@ -86,48 +99,55 @@ DocIt = (function() {
     });
   };
 
-  DocIt.prototype.renamePageInMap = function(filepath, oldpath) {
-    var folder, i, newFile, newFolder, oldFile, oldFolder, page, _i, _len;
-    newFile = this.splitFilePath(filepath);
-    newFolder = this.getFolder(filepath);
-    oldFile = this.splitFilePath(oldpath);
-    oldFolder = this.getFolder(oldpath);
-    folder = this.map[oldFolder];
+  DocIt.prototype.renamePageInMap = function(o) {
+    var folder, i, map, newFile, newFilePath, newFolder, oldFile, oldFilePath, oldFolder, page, _i, _len;
+    newFilePath = o.newPath;
+    oldFilePath = o.oldPath;
+    map = o.map;
+    newFile = this.splitFilePath(newFilePath);
+    newFolder = this.getFolder(newFilePath);
+    oldFile = this.splitFilePath(oldFilePath);
+    oldFolder = this.getFolder(oldFilePath);
+    folder = map[oldFolder];
     for (i = _i = 0, _len = folder.length; _i < _len; i = ++_i) {
       page = folder[i];
       if (page === oldFile.fileName) {
         folder[i] = newFile.fileName;
       }
     }
-    return this.writeMap(this.map);
+    return map;
   };
 
-  DocIt.prototype.addPageToMap = function(filepath, isRefresh) {
-    var file, fileName, folder;
+  DocIt.prototype.addPageToMap = function(o) {
+    var file, fileName, filepath, folder, map;
+    map = o.map;
+    filepath = o.filepath;
     file = this.splitFilePath(filepath);
     folder = this.getFolder(filepath);
     if (folder === ("" + this.pagesFolder + "/partials/")) {
       return;
     }
-    folder = this.map[folder];
+    folder = map[folder];
     fileName = file.fileName;
     if (__indexOf.call(folder, fileName) >= 0) {
       return;
     } else {
       folder.push(fileName);
     }
-    return this.writeMap(this.map);
+    return map;
   };
 
-  DocIt.prototype.removePageFromMap = function(filepath) {
-    var file, folder, newPages, pages;
+  DocIt.prototype.removePageFromMap = function(o) {
+    var file, filepath, folder, map, newPages, pages;
+    map = o.map;
+    filepath = o.filepath;
     file = this.splitFilePath(filepath);
     folder = this.getFolder(filepath);
     if (folder === ("" + this.pagesFolder + "/partials/")) {
       return;
     }
     newPages = [];
-    pages = this.map[folder];
+    pages = map[folder];
     pages.forEach(function(page) {
       var fileName;
       fileName = file.fileName.replace('.html', '');
@@ -135,8 +155,8 @@ DocIt = (function() {
         return newPages.push(page);
       }
     });
-    this.map[folder] = newPages;
-    return this.writeMap(this.map);
+    map[folder] = newPages;
+    return map;
   };
 
   DocIt.prototype.writeMap = function(map) {
