@@ -1,4 +1,4 @@
-var DocIt, fs, fse, gaze, jade, jf, livereload, mkdirp, shell,
+var DocIt, fs, fse, gaze, jade, jf, livereload, mkdirp, recursive, shell,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 jade = require('jade');
@@ -19,34 +19,46 @@ livereload = require('livereload');
 
 shell = require('shelljs/global');
 
+recursive = require('readdir-recursive');
+
 DocIt = (function() {
   function DocIt(o) {
     this.o = o != null ? o : {};
     this.vars();
     this.createFolders();
+    this.getProjectFiles();
     !this.o.isLivereloadLess && this.createLivereloadServer();
-    this.listenPages();
+    !this.o.isDev && this.listenPages();
     return this;
   }
 
   DocIt.prototype.createFolders = function() {
-    var items, _ref;
-    items = fs.readdirSync('../');
+    var fromDir, items, nBaseurl, _ref;
+    nBaseurl = this.isDev ? './' : '.docit/';
+    this.baseUrl = this.isDev ? '../' : './';
+    items = fs.readdirSync(this.baseUrl);
     if (!(__indexOf.call(items, 'css') >= 0)) {
-      fse.copySync('./project-folders/css/', '../css');
+      fse.copySync("" + nBaseurl + "project-folders/css/", "" + this.baseUrl + "css");
     }
     if (!(_ref = "" + this.projectName + "-pages", __indexOf.call(items, _ref) >= 0)) {
-      return fse.copySync('./project-folders/docit-pages/', '../docit-pages');
+      fromDir = "" + nBaseurl + "./project-folders/docit-pages/";
+      return fse.copySync(fromDir, "" + this.baseUrl + "docit-pages");
     }
   };
 
+  DocIt.prototype.getProjectFiles = function() {
+    var files, map;
+    files = recursive.fileSync("" + this.baseUrl + "docit-pages/");
+    map = this.parseFolderToMap(files);
+    return this.writeMap(map);
+  };
+
   DocIt.prototype.vars = function() {
+    this.isDev = this.o.isDev;
     this.projectName = "docit";
-    this.pagesFolder = "../" + this.projectName + "-pages";
-    this.pagFiles = "" + this.pagesFolder + "/**/*.jade";
-    this.compilePage = this.compilePage.bind(this);
-    this.removePageFromMap = this.removePageFromMap.bind(this);
-    return this.generateJSONMap = this.generateJSONMap.bind(this);
+    this.pagesFolder = "" + this.projectName + "-pages";
+    this.pageFiles = "" + this.pagesFolder + "/**/*.html";
+    return this.removePageFromMap = this.removePageFromMap.bind(this);
   };
 
   DocIt.prototype.createLivereloadServer = function() {
@@ -58,90 +70,151 @@ DocIt = (function() {
   DocIt.prototype.listenPages = function() {
     var it;
     it = this;
-    return gaze(this.pagFiles, function(err, watcher) {
-      this.relative(it.generateJSONMap);
-      this.on('changed', it.compilePage);
+    return gaze(this.pageFiles, function(err, watcher) {
+      it.watcher = watcher;
       this.on('added', function(filepath) {
-        it.addPageToMap(filepath);
-        return it.compilePage(filepath);
+        var map;
+        map = it.addPageToMap({
+          filepath: filepath,
+          map: it.map
+        });
+        return it.writeMap(map);
       });
-      return this.on('deleted', it.removePageFromMap);
+      this.on('deleted', function(filepath) {
+        var map;
+        map = it.removePageFromMap({
+          filepath: filepath,
+          map: it.map
+        });
+        return it.writeMap(map);
+      });
+      return this.on('renamed', function(filepath, oldpath) {
+        var map, options;
+        if (filepath.match(/\.trash/gi)) {
+          map = it.removePageFromMap({
+            filepath: oldpath,
+            map: it.map
+          });
+          it.writeMap(map);
+        } else {
+          options = {
+            newPath: filepath,
+            oldPath: oldpath,
+            map: it.map
+          };
+          map = it.renamePageInMap(options);
+          it.writeMap(map);
+        }
+        return true;
+      });
     });
   };
 
-  DocIt.prototype.compilePage = function(filepath) {
-    var file;
-    file = this.splitFilePath(filepath);
-    if (!file.path.match(/\/partials\//)) {
-      jade.renderFile(filepath);
-      return this.server.refresh(filepath);
+  DocIt.prototype.parseFolderToMap = function(files) {
+    var base, file, fileName, filePathArr, folderName, i, map, _i, _len;
+    map = {};
+    for (i = _i = 0, _len = files.length; _i < _len; i = ++_i) {
+      file = files[i];
+      base = file.split('docit-pages/')[1];
+      filePathArr = base.split('/');
+      if (filePathArr.length === 1) {
+        fileName = filePathArr[0];
+        if (fileName.match(/\.html$/gi)) {
+          if (map['pages'] == null) {
+            map['pages'] = [];
+          }
+          map['pages'].push(fileName.replace('.html', ''));
+        }
+      } else {
+        fileName = filePathArr[filePathArr.length - 1];
+        if (!fileName.match(/\.html$/gi)) {
+          continue;
+        }
+        filePathArr = filePathArr.slice(0, filePathArr.length - 1);
+        if (filePathArr.length > 1) {
+          console.warn("only one level of nesting allowed: \"" + filePathArr[1] + "\" would be ignored");
+        }
+        if ((folderName = filePathArr[0]) !== 'partials') {
+          if (map[folderName] == null) {
+            map[folderName] = [];
+          }
+          map[folderName].push(fileName.replace('.html', ''));
+        }
+      }
     }
+    return map;
   };
 
-  DocIt.prototype.addPageToMap = function(filepath, isRefresh) {
-    var file, folder;
+  DocIt.prototype.renamePageInMap = function(o) {
+    var folder, i, isChanged, map, newFile, newFilePath, newFolder, oldFile, oldFilePath, oldFolder, page, _i, _len;
+    newFilePath = o.newPath;
+    oldFilePath = o.oldPath;
+    map = o.map;
+    newFile = this.splitFilePath(newFilePath);
+    newFolder = this.getFolder(newFilePath);
+    oldFile = this.splitFilePath(oldFilePath);
+    oldFolder = this.getFolder(oldFilePath);
+    folder = map[oldFolder];
+    isChanged = false;
+    for (i = _i = 0, _len = folder.length; _i < _len; i = ++_i) {
+      page = folder[i];
+      if (page === oldFile.fileName) {
+        folder[i] = newFile.fileName;
+        isChanged = true;
+      }
+      if (i === folder.length - 1 && isChanged === false) {
+        folder.push(newFile.fileName);
+      }
+    }
+    return map;
+  };
+
+  DocIt.prototype.addPageToMap = function(o) {
+    var file, fileName, filepath, folder, map;
+    map = o.map;
+    filepath = o.filepath;
     file = this.splitFilePath(filepath);
     folder = this.getFolder(filepath);
     if (folder === ("" + this.pagesFolder + "/partials/")) {
       return;
     }
-    this.map[folder].push(file.fileName);
-    return this.writeMap();
+    folder = map[folder];
+    fileName = file.fileName;
+    if (__indexOf.call(folder, fileName) >= 0) {
+      return;
+    } else {
+      folder.push(fileName);
+    }
+    return map;
   };
 
-  DocIt.prototype.removePageFromMap = function(filepath) {
-    var file, folder, newPages, pages;
+  DocIt.prototype.removePageFromMap = function(o) {
+    var file, filepath, folder, map, newPages, pages;
+    map = o.map;
+    filepath = o.filepath;
     file = this.splitFilePath(filepath);
     folder = this.getFolder(filepath);
     if (folder === ("" + this.pagesFolder + "/partials/")) {
       return;
     }
-    fs.unlink(filepath.replace('.jade', '.html'));
     newPages = [];
-    pages = this.map[folder];
+    pages = map[folder];
     pages.forEach(function(page) {
-      if (page !== file.fileName) {
+      var fileName;
+      fileName = file.fileName.replace('.html', '');
+      if (page !== fileName) {
         return newPages.push(page);
       }
     });
-    this.map[folder] = newPages;
-    return this.writeMap();
+    map[folder] = newPages;
+    return map;
   };
 
-  DocIt.prototype.writeMap = function() {
-    return jf.writeFile('pages.json', this.map, (function(_this) {
-      return function(err) {
-        if (err) {
-          return console.error('could not write to pages.json');
-        } else {
-          return _this.server.refresh('pages.json');
-        }
-      };
-    })(this));
-  };
-
-  DocIt.prototype.generateJSONMap = function(err, files) {
-    this.map = {};
-    Object.keys(files).forEach((function(_this) {
-      return function(key) {
-        var folder, items;
-        if (key === ("" + _this.pagesFolder + "/partials/")) {
-          return;
-        }
-        folder = _this.getFolder(key);
-        if (folder === ("" + _this.projectName + "-pages")) {
-          folder = 'pages';
-        }
-        items = [];
-        files[key].forEach(function(item) {
-          if (!_this.isFolder(item)) {
-            return items.push(item.replace('.jade', ''));
-          }
-        });
-        return _this.map[folder] = items;
-      };
-    })(this));
-    return this.writeMap();
+  DocIt.prototype.writeMap = function(map) {
+    var _ref;
+    this.map = map;
+    jf.writeFileSync("./pages.json", map);
+    return (_ref = this.server) != null ? _ref.refresh('./pages.json') : void 0;
   };
 
   DocIt.prototype.isFolder = function(path) {

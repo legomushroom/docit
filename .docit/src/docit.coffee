@@ -10,95 +10,140 @@ livereload = require 'livereload'
 
 shell      = require 'shelljs/global'
 
+recursive = require  'readdir-recursive'
+
 class DocIt
   constructor:(@o={})->
     @vars()
     @createFolders()
+    @getProjectFiles()
     !@o.isLivereloadLess and @createLivereloadServer()
-    @listenPages()
+    !@o.isDev and @listenPages()
     return @
 
   createFolders:->
-    items = fs.readdirSync '../'
+    nBaseurl = if @isDev then './' else '.docit/'
+    @baseUrl  = if @isDev then '../' else './'
+    items = fs.readdirSync @baseUrl
     if !('css' in items)
-      fse.copySync './project-folders/css/', '../css'
+      fse.copySync "#{nBaseurl}project-folders/css/", "#{@baseUrl}css"
     if !("#{@projectName}-pages" in items)
-      fse.copySync './project-folders/docit-pages/', '../docit-pages'
-
-
+      fromDir = "#{nBaseurl}./project-folders/docit-pages/"
+      fse.copySync fromDir, "#{@baseUrl}docit-pages"
+  getProjectFiles:->
+    files = recursive.fileSync "#{@baseUrl}docit-pages/"
+    map = @parseFolderToMap files
+    @writeMap map
   vars:->
+    @isDev = @o.isDev
     @projectName = "docit"
-    @pagesFolder = "../#{@projectName}-pages"
-    @pagFiles    = "#{@pagesFolder}/**/*.jade"
-    @compilePage        = @compilePage.bind       @
+    @pagesFolder = "#{@projectName}-pages"
+    @pageFiles    = "#{@pagesFolder}/**/*.html"
     @removePageFromMap  = @removePageFromMap.bind @
-    @generateJSONMap    = @generateJSONMap.bind   @
   createLivereloadServer:-> @server = livereload.createServer({ port: 41000 })
   listenPages:->
     it = @
-    gaze @pagFiles, (err, watcher) ->
-      @relative it.generateJSONMap
-      @on 'changed', it.compilePage
-      @on 'added',  (filepath)->
-        it.addPageToMap filepath
-        it.compilePage  filepath
-      @on 'deleted', it.removePageFromMap
-  
-  compilePage:(filepath)->
-    file = @splitFilePath(filepath)
-    if !file.path.match /\/partials\//
-      jade.renderFile(filepath)
-      @server.refresh(filepath)
-
-  addPageToMap:(filepath, isRefresh)->
+    gaze @pageFiles, (err, watcher) ->
+      it.watcher = watcher
+      @on 'added',   (filepath)->
+        map = it.addPageToMap filepath: filepath, map: it.map
+        it.writeMap map
+      @on 'deleted', (filepath)->
+        map = it.removePageFromMap filepath: filepath, map: it.map
+        it.writeMap map
+      @on 'renamed', (filepath, oldpath)->
+        if filepath.match /\.trash/gi
+          map = it.removePageFromMap filepath: oldpath, map: it.map
+          it.writeMap map
+        else
+          options = newPath: filepath, oldPath: oldpath, map: it.map
+          map = it.renamePageInMap options
+          it.writeMap map
+        true
+      # it.isDev and @on 'all', (e, filepath)-> console.log 'all', e
+      # @on 'all', (e, filepath)-> console.log 'all', e
+  parseFolderToMap:(files)->
+    map = {}
+    for file, i in files
+      base = file.split('docit-pages/')[1]
+      filePathArr = base.split '/'
+      # if just a file name then
+      # put it in the "pages" folder
+      if filePathArr.length is 1
+        fileName = filePathArr[0]
+        if fileName.match /\.html$/gi
+          map['pages'] ?= []
+          map['pages'].push fileName.replace '.html', ''
+      else
+        # if file is inside another nested folder
+        # save this file to map as a sibling of "pages"
+        # folder but only if the folder name isnt "partials"
+        fileName = filePathArr[filePathArr.length-1]
+        if !fileName.match /\.html$/gi then continue
+        filePathArr = filePathArr.slice(0, filePathArr.length-1)
+        if filePathArr.length > 1
+          console.warn "only one level of
+             nesting allowed: \"#{filePathArr[1]}\" would be ignored"
+        if (folderName = filePathArr[0]) isnt 'partials'
+          map[folderName] ?= []
+          map[folderName].push fileName.replace '.html', ''
+    map
+  # compilePage:(filepath)->
+  #   console.log filepath
+  #   file = @splitFilePath(filepath)
+  #   console.log file
+  #   if !file.path.match /\/partials\//
+  #     console.log 'yup'
+  #     jade.renderFile(filepath)
+  #     @server.refresh(filepath)
+  renamePageInMap:(o)->
+    newFilePath = o.newPath; oldFilePath = o.oldPath; map = o.map
+    newFile   = @splitFilePath newFilePath
+    newFolder = @getFolder newFilePath
+    oldFile   = @splitFilePath oldFilePath
+    oldFolder = @getFolder oldFilePath
+    folder = map[oldFolder]
+    isChanged = false
+    for page, i in folder
+      if page is oldFile.fileName
+        folder[i] = newFile.fileName
+        isChanged = true
+      # if delete event fired first
+      if i is folder.length-1 and isChanged is false
+        folder.push newFile.fileName
+    map
+  addPageToMap:(o)->
+    map = o.map; filepath = o.filepath
     file   = @splitFilePath filepath
     folder = @getFolder filepath
     return if folder is "#{@pagesFolder}/partials/"
-
-    @map[folder].push file.fileName
-    @writeMap()
-
-  removePageFromMap:(filepath)->
+    folder = map[folder]; fileName = file.fileName
+    if fileName in folder then return
+    else folder.push fileName
+    map
+  removePageFromMap:(o)->
+    map = o.map; filepath = o.filepath
     file   = @splitFilePath filepath
     folder = @getFolder filepath
     return if folder is "#{@pagesFolder}/partials/"
-
-    fs.unlink filepath.replace('.jade', '.html')
-
     newPages = []
-    pages = @map[folder]
+    pages = map[folder]
     pages.forEach (page)->
-      if page isnt file.fileName
+      fileName = file.fileName.replace '.html', ''
+      if page isnt fileName
         newPages.push page
+    map[folder] = newPages
+    map
+  writeMap:(map)->
+    @map = map
+    jf.writeFileSync "./pages.json", map
+    @server?.refresh('./pages.json')
 
-    @map[folder] = newPages
-    @writeMap()
-
-  writeMap:->
-    jf.writeFile 'pages.json', @map, (err)=>
-      if err then console.error 'could not write to pages.json'
-      else @server.refresh('pages.json')
-
-  generateJSONMap:(err, files)->
-    # console.log files
-    @map = {}
-    Object.keys(files).forEach (key)=>
-      return if key is "#{@pagesFolder}/partials/"
-      folder = @getFolder key
-      if folder is "#{@projectName}-pages" then folder = 'pages'
-      items = []
-      files[key].forEach (item)=>
-        if !@isFolder item then items.push item.replace('.jade', '')
-      @map[folder] = items
-
-    @writeMap()
-      
   isFolder:(path)-> path.substr(path.length-1) is '/'
   getFolder:(path)->
     pathArr = path.split '/'
     folder = pathArr[pathArr.length-2]
     if folder is "#{@projectName}-pages" then 'pages' else folder
-
   splitFilePath:(p)->
     pathArr = p.split("/")
     fileName = pathArr[pathArr.length - 1]
@@ -106,16 +151,13 @@ class DocIt
     extension = extension[extension.length-1]
     path = pathArr.slice(0, pathArr.length - 1)
     pathStr = path.join("/") + "/"
-    
     regex = new RegExp "\.#{extension}", 'gi'
     file =
       path:       pathStr
       fileName:   fileName.replace regex, ''
       extension:  extension
-
   stop:->
     
-
 # new DocIt
 module.exports = DocIt
 

@@ -18,7 +18,12 @@ TestHelpers = (function() {
     });
     items = fs.readdirSync('../');
     if (__indexOf.call(items, 'index.html') >= 0) {
-      return fs.unlink('../index.html', function(err) {
+      fs.unlink('../index.html', function(err) {
+        return console.log(err);
+      });
+    }
+    if (__indexOf.call(items, 'pages.json') >= 0) {
+      return fs.unlink('../pages.json', function(err) {
         return console.log(err);
       });
     }
