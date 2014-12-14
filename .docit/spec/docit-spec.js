@@ -31,7 +31,7 @@ describe('docit', function() {
       return expect(__indexOf.call(items, 'docit-pages') >= 0).toBe(true);
     });
   });
-  return describe('methods', function() {
+  describe('methods', function() {
     describe('isFolder method', function() {
       return it('check if passed path ends with "/"', function() {
         var isFolder1, isFolder2, path1, path2;
@@ -120,12 +120,17 @@ describe('docit', function() {
     return describe('writeMap method', function() {
       return it('should write passed map to package.json file', function() {
         var files, map, pages;
-        files = ['/user/bin/docit-pages/type.html', '/user/bin/docit-pages/partials/icon.jade'];
+        files = ['/user/bin/docit-pages/buttons.html', '/user/bin/docit-pages/partials/icon.jade'];
         map = docit.parseFolderToMap(files);
         docit.writeMap(map);
         pages = jf.readFileSync('pages.json');
-        return expect(JSON.stringify(pages)).toBe('{"pages":["type"]}');
+        return expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}');
       });
+    });
+  });
+  return describe('file listeners', function() {
+    return it('should generate map on file add', function() {
+      return fs.writeFileSync('../docit-pages/type.html', '<h2>Heading</h2>');
     });
   });
 });

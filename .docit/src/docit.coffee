@@ -18,7 +18,11 @@ class DocIt
     @createFolders()
     @getProjectFiles()
     !@o.isLivereloadLess and @createLivereloadServer()
-    !@o.isDev and @listenPages()
+    @listenPages()
+    # setTimeout =>
+    #   fs.writeFileSync 'docit-pages/type2.html', '<h2>Heading</h2>'
+    # , 2000
+
     return @
   createFolders:->
     nBaseurl = if @isDev then './' else '.docit/'
@@ -30,13 +34,13 @@ class DocIt
       fromDir = "#{nBaseurl}./project-folders/docit-pages/"
       fse.copySync fromDir, "#{@baseUrl}docit-pages"
   getProjectFiles:->
-    files = recursive.fileSync '../docit-pages/'
+    files = recursive.fileSync './docit-pages/'
     map = @parseFolderToMap files
     @writeMap map
   vars:->
     @isDev = @o.isDev
     @projectName = "docit"
-    @pagesFolder = "./#{@projectName}-pages"
+    @pagesFolder = "#{@projectName}-pages"
     @pageFiles    = "#{@pagesFolder}/**/*.html"
     @removePageFromMap  = @removePageFromMap.bind @
 
@@ -44,19 +48,20 @@ class DocIt
   listenPages:->
     it = @
     gaze @pageFiles, (err, watcher) ->
-      @on 'added',   (filepath)=>
-        map = it.addPageToMap filepath: filepath, map: @map
-        @writeMap map
+      it.watcher = watcher
+      @on 'added',   (filepath)->
+        map = it.addPageToMap filepath: filepath, map: it.map
+        it.writeMap map
       @on 'deleted', it.removePageFromMap
       @on 'renamed', (filepath, oldpath)->
         if filepath.match /\.trash/gi
-          @writeMap it.removePageFromMap filepath: oldpath, map: @map
+          map = it.removePageFromMap filepath: oldpath, map: it.map
+          it.writeMap map
         else
           it.renamePageInMap filepath, oldpath
           watcher.close(); it.listenPages()
         true
-      @on 'all', (e, filepath)->
-        console.log 'all', e
+      it.isDev and @on 'all', (e, filepath)-> console.log 'all', e
 
   parseFolderToMap:(files)->
     map = {}

@@ -28,7 +28,7 @@ DocIt = (function() {
     this.createFolders();
     this.getProjectFiles();
     !this.o.isLivereloadLess && this.createLivereloadServer();
-    !this.o.isDev && this.listenPages();
+    this.listenPages();
     return this;
   }
 
@@ -48,7 +48,7 @@ DocIt = (function() {
 
   DocIt.prototype.getProjectFiles = function() {
     var files, map;
-    files = recursive.fileSync('../docit-pages/');
+    files = recursive.fileSync('./docit-pages/');
     map = this.parseFolderToMap(files);
     return this.writeMap(map);
   };
@@ -56,7 +56,7 @@ DocIt = (function() {
   DocIt.prototype.vars = function() {
     this.isDev = this.o.isDev;
     this.projectName = "docit";
-    this.pagesFolder = "./" + this.projectName + "-pages";
+    this.pagesFolder = "" + this.projectName + "-pages";
     this.pageFiles = "" + this.pagesFolder + "/**/*.html";
     return this.removePageFromMap = this.removePageFromMap.bind(this);
   };
@@ -71,23 +71,24 @@ DocIt = (function() {
     var it;
     it = this;
     return gaze(this.pageFiles, function(err, watcher) {
-      this.on('added', (function(_this) {
-        return function(filepath) {
-          var map;
-          map = it.addPageToMap({
-            filepath: filepath,
-            map: _this.map
-          });
-          return _this.writeMap(map);
-        };
-      })(this));
+      it.watcher = watcher;
+      this.on('added', function(filepath) {
+        var map;
+        map = it.addPageToMap({
+          filepath: filepath,
+          map: it.map
+        });
+        return it.writeMap(map);
+      });
       this.on('deleted', it.removePageFromMap);
       this.on('renamed', function(filepath, oldpath) {
+        var map;
         if (filepath.match(/\.trash/gi)) {
-          this.writeMap(it.removePageFromMap({
+          map = it.removePageFromMap({
             filepath: oldpath,
-            map: this.map
-          }));
+            map: it.map
+          });
+          it.writeMap(map);
         } else {
           it.renamePageInMap(filepath, oldpath);
           watcher.close();
@@ -95,7 +96,7 @@ DocIt = (function() {
         }
         return true;
       });
-      return this.on('all', function(e, filepath) {
+      return it.isDev && this.on('all', function(e, filepath) {
         return console.log('all', e);
       });
     });

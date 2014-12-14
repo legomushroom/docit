@@ -19,25 +19,6 @@ describe 'docit', ->
       items           = fs.readdirSync '../'
       expect('css' in items).toBe                   true
       expect('docit-pages'  in items).toBe          true
-      # expect('buttons.html' in pagesFolder).toBe    true
-      # expect('partials'     in pagesFolder).toBe    true
-      # expect('buttons.css'  in cssFolder).toBe      true
-      # expect('icon.jade'    in partialsFolder).toBe true
-    # describe 'json map storage', ->
-    #   map = null
-    #   it 'should generate json map', (done)->
-    #     setTimeout ->
-    #       expect(JSON.stringify(docit.map)).toBe('{pages:["buttons1s"]}')
-    #       done()
-    #     , 50
-
-    #   # it 'should generate json map to pages.json file', (done)->
-    #   #   pages = jf.readdirSync '../pages.json'
-    #   #   console.log pages
-    #   #   expect(JSON.stringify(pages)).toBe('{pages:["buttons"]}')
-    #   #   done()
-
-
   describe 'methods', ->
     describe 'isFolder method', ->
       it 'check if passed path ends with "/"', ->
@@ -75,7 +56,6 @@ describe 'docit', ->
         options = { map: map, oldPath: oldPath, newPath: newPath }
         map = docit.renamePageInMap options
         expect(JSON.stringify(map)).toBe '{"pages":["type","forms"]}'
-
     describe 'parseFolderToMap method', ->
       it 'should parse file and folders to map object', ->
         files = [
@@ -87,7 +67,6 @@ describe 'docit', ->
         map = docit.parseFolderToMap files
         filesString = '{"pages":["type"],"about-us":["header","footer"]}'
         expect(JSON.stringify(map)).toBe filesString
-
       it 'should throw if more the 1 level nested', ->
         files = [
           '/user/bin/docit-pages/type.html'
@@ -100,20 +79,19 @@ describe 'docit', ->
         expect(console.warn).toHaveBeenCalled()
         filesString = '{"pages":["type"],"about-us":["header","footer"]}'
         expect(JSON.stringify(map)).toBe filesString
-
     describe 'writeMap method', ->
       it 'should write passed map to package.json file', ->
         files = [
-          '/user/bin/docit-pages/type.html'
+          '/user/bin/docit-pages/buttons.html'
           '/user/bin/docit-pages/partials/icon.jade'
         ]
         map = docit.parseFolderToMap files
         docit.writeMap map
         pages = jf.readFileSync('pages.json')
-        expect(JSON.stringify(pages)).toBe('{"pages":["type"]}')
-
-
-
+        expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}')
+  describe 'file listeners', ->
+    it 'should generate map on file add', ->
+      fs.writeFileSync '../docit-pages/type.html', '<h2>Heading</h2>'
 
 
 

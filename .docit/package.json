@@ -52,7 +52,7 @@
     "gulp-watch": "*",
     "jasmine-node": "2.0.0-beta4",
     "mkdirp": "^0.5.0",
-    "nodemon": "*",
+    "nodemon": "^1.2.1",
     "pm2": "^0.12.1",
     "ps-node": "0.0.3",
     "rimraf": "^2.2.8",
