@@ -49,13 +49,27 @@ describe 'docit', ->
         map = docit.removePageFromMap { map: map, filepath: path }
         expect(JSON.stringify(map)).toBe '{"pages":["colors"]}'
     describe 'renamePageInMap method', ->
-      it 'should remove page name from map', ->
+      it 'should rename page name in map', ->
         oldPath = '/user/bin/docit-pages/type2.html'
         newPath = '/user/bin/docit-pages/type.html'
         map = {pages:['type2','forms']}
         options = { map: map, oldPath: oldPath, newPath: newPath }
         map = docit.renamePageInMap options
         expect(JSON.stringify(map)).toBe '{"pages":["type","forms"]}'
+      it 'should add page name if folder is empty', ->
+        oldPath = '/user/bin/docit-pages/type2.html'
+        newPath = '/user/bin/docit-pages/type.html'
+        map = {pages:[]}
+        options = { map: map, oldPath: oldPath, newPath: newPath }
+        map = docit.renamePageInMap options
+        expect(JSON.stringify(map)).toBe '{"pages":["type"]}'
+      it 'should add page name if folder doesn\'t contain the page name ', ->
+        oldPath = '/user/bin/docit-pages/type2.html'
+        newPath = '/user/bin/docit-pages/type.html'
+        map = {pages:['buttons']}
+        options = { map: map, oldPath: oldPath, newPath: newPath }
+        map = docit.renamePageInMap options
+        expect(JSON.stringify(map)).toBe '{"pages":["buttons","type"]}'
     describe 'parseFolderToMap method', ->
       it 'should parse file and folders to map object', ->
         files = [
@@ -67,7 +81,6 @@ describe 'docit', ->
         map = docit.parseFolderToMap files
         filesString = '{"pages":["type"],"about-us":["header","footer"]}'
         expect(JSON.stringify(map)).toBe filesString
-      
       it 'should add only .html files to map', ->
         files = [
           '/user/bin/docit-pages/type.html'
@@ -76,7 +89,6 @@ describe 'docit', ->
         map = docit.parseFolderToMap files
         filesString = '{"pages":["type"]}'
         expect(JSON.stringify(map)).toBe filesString
-
       it 'should warn if more the 1 level nested', ->
         files = [
           '/user/bin/docit-pages/type.html'
@@ -99,10 +111,35 @@ describe 'docit', ->
         docit.writeMap map
         pages = jf.readFileSync('pages.json')
         expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}')
-  # describe 'file listeners', ->
-  #   exec 'cd ../ && docit'
-  #   it 'should generate map on file add', ->
-  #     fs.writeFileSync '../docit-pages/type.html', '<h2>Heading</h2>'
+  describe 'file listeners', ()->
+    it 'should generate map on file add', (done)->
+      fs.writeFileSync '../docit-pages/colors.html', '<h2>Heading</h2>'
+      setTimeout ->
+        expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons","colors"]}')
+        pages = jf.readFileSync('./pages.json')
+        expect(JSON.stringify(pages)).toBe('{"pages":["buttons","colors"]}')
+        done()
+      , 1000
+    it 'should generate map on file delete', (done)->
+      fs.unlink '../docit-pages/colors.html'
+      setTimeout ->
+        pages = jf.readFileSync('./pages.json')
+        expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons"]}')
+        expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}')
+        done()
+      , 1000
+    it 'should generate map on file rename', (done)->
+      oldName = '../docit-pages/buttons.html'
+      newName = '../docit-pages/buttons-new.html'
+      fs.renameSync oldName, newName
+      setTimeout ->
+        pages = jf.readFileSync('./pages.json')
+        expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons-new"]}')
+        expect(JSON.stringify(pages)).toBe('{"pages":["buttons-new"]}')
+        done()
+      , 1000
+
+
 
 
 

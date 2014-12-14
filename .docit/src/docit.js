@@ -28,7 +28,7 @@ DocIt = (function() {
     this.createFolders();
     this.getProjectFiles();
     !this.o.isLivereloadLess && this.createLivereloadServer();
-    !this.o.isDev && this.listenPages();
+    this.listenPages();
     return this;
   }
 
@@ -54,9 +54,11 @@ DocIt = (function() {
   };
 
   DocIt.prototype.vars = function() {
+    var prefix;
     this.isDev = this.o.isDev;
     this.projectName = "docit";
-    this.pagesFolder = "" + this.projectName + "-pages";
+    prefix = this.isDev ? '../' : '';
+    this.pagesFolder = "" + prefix + this.projectName + "-pages";
     this.pageFiles = "" + this.pagesFolder + "/**/*.html";
     return this.removePageFromMap = this.removePageFromMap.bind(this);
   };
@@ -156,15 +158,19 @@ DocIt = (function() {
     oldFolder = this.getFolder(oldFilePath);
     folder = map[oldFolder];
     isChanged = false;
-    for (i = _i = 0, _len = folder.length; _i < _len; i = ++_i) {
-      page = folder[i];
-      if (page === oldFile.fileName) {
-        folder[i] = newFile.fileName;
-        isChanged = true;
+    if (folder.length > 0) {
+      for (i = _i = 0, _len = folder.length; _i < _len; i = ++_i) {
+        page = folder[i];
+        if (page === oldFile.fileName) {
+          folder[i] = newFile.fileName;
+          isChanged = true;
+        }
+        if (i === folder.length - 1 && isChanged === false) {
+          folder.push(newFile.fileName);
+        }
       }
-      if (i === folder.length - 1 && isChanged === false) {
-        folder.push(newFile.fileName);
-      }
+    } else {
+      folder.push(newFile.fileName);
     }
     return map;
   };

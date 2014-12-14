@@ -18,7 +18,7 @@ class DocIt
     @createFolders()
     @getProjectFiles()
     !@o.isLivereloadLess and @createLivereloadServer()
-    !@o.isDev and @listenPages()
+    @listenPages()
     return @
 
   createFolders:->
@@ -37,7 +37,9 @@ class DocIt
   vars:->
     @isDev = @o.isDev
     @projectName = "docit"
-    @pagesFolder = "#{@projectName}-pages"
+    # for testing purposes
+    prefix = if @isDev then '../' else ''
+    @pagesFolder = "#{prefix}#{@projectName}-pages"
     @pageFiles    = "#{@pagesFolder}/**/*.html"
     @removePageFromMap  = @removePageFromMap.bind @
   createLivereloadServer:-> @server = livereload.createServer({ port: 41000 })
@@ -104,13 +106,18 @@ class DocIt
     oldFolder = @getFolder oldFilePath
     folder = map[oldFolder]
     isChanged = false
-    for page, i in folder
-      if page is oldFile.fileName
-        folder[i] = newFile.fileName
-        isChanged = true
-      # if delete event fired first
-      if i is folder.length-1 and isChanged is false
-        folder.push newFile.fileName
+
+    if folder.length > 0
+      for page, i in folder
+        if page is oldFile.fileName
+          folder[i] = newFile.fileName
+          isChanged = true
+        # if delete event fired first
+        if i is folder.length-1 and isChanged is false
+          folder.push newFile.fileName
+    # if delete event fired first and folder is empty
+    else folder.push newFile.fileName
+
     map
   addPageToMap:(o)->
     map = o.map; filepath = o.filepath

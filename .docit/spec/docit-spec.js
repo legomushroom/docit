@@ -31,7 +31,7 @@ describe('docit', function() {
       return expect(__indexOf.call(items, 'docit-pages') >= 0).toBe(true);
     });
   });
-  return describe('methods', function() {
+  describe('methods', function() {
     describe('isFolder method', function() {
       return it('check if passed path ends with "/"', function() {
         var isFolder1, isFolder2, path1, path2;
@@ -83,7 +83,7 @@ describe('docit', function() {
       });
     });
     describe('renamePageInMap method', function() {
-      return it('should remove page name from map', function() {
+      it('should rename page name in map', function() {
         var map, newPath, oldPath, options;
         oldPath = '/user/bin/docit-pages/type2.html';
         newPath = '/user/bin/docit-pages/type.html';
@@ -97,6 +97,36 @@ describe('docit', function() {
         };
         map = docit.renamePageInMap(options);
         return expect(JSON.stringify(map)).toBe('{"pages":["type","forms"]}');
+      });
+      it('should add page name if folder is empty', function() {
+        var map, newPath, oldPath, options;
+        oldPath = '/user/bin/docit-pages/type2.html';
+        newPath = '/user/bin/docit-pages/type.html';
+        map = {
+          pages: []
+        };
+        options = {
+          map: map,
+          oldPath: oldPath,
+          newPath: newPath
+        };
+        map = docit.renamePageInMap(options);
+        return expect(JSON.stringify(map)).toBe('{"pages":["type"]}');
+      });
+      return it('should add page name if folder doesn\'t contain the page name ', function() {
+        var map, newPath, oldPath, options;
+        oldPath = '/user/bin/docit-pages/type2.html';
+        newPath = '/user/bin/docit-pages/type.html';
+        map = {
+          pages: ['buttons']
+        };
+        options = {
+          map: map,
+          oldPath: oldPath,
+          newPath: newPath
+        };
+        map = docit.renamePageInMap(options);
+        return expect(JSON.stringify(map)).toBe('{"pages":["buttons","type"]}');
       });
     });
     describe('parseFolderToMap method', function() {
@@ -133,6 +163,41 @@ describe('docit', function() {
         pages = jf.readFileSync('pages.json');
         return expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}');
       });
+    });
+  });
+  return describe('file listeners', function() {
+    it('should generate map on file add', function(done) {
+      fs.writeFileSync('../docit-pages/colors.html', '<h2>Heading</h2>');
+      return setTimeout(function() {
+        var pages;
+        expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons","colors"]}');
+        pages = jf.readFileSync('./pages.json');
+        expect(JSON.stringify(pages)).toBe('{"pages":["buttons","colors"]}');
+        return done();
+      }, 1000);
+    });
+    it('should generate map on file delete', function(done) {
+      fs.unlink('../docit-pages/colors.html');
+      return setTimeout(function() {
+        var pages;
+        pages = jf.readFileSync('./pages.json');
+        expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons"]}');
+        expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}');
+        return done();
+      }, 1000);
+    });
+    return it('should generate map on file rename', function(done) {
+      var newName, oldName;
+      oldName = '../docit-pages/buttons.html';
+      newName = '../docit-pages/buttons-new.html';
+      fs.renameSync(oldName, newName);
+      return setTimeout(function() {
+        var pages;
+        pages = jf.readFileSync('./pages.json');
+        expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons-new"]}');
+        expect(JSON.stringify(pages)).toBe('{"pages":["buttons-new"]}');
+        return done();
+      }, 1000);
     });
   });
 });
