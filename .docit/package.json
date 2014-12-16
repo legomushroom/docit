@@ -16,7 +16,8 @@
     "docit": "docit.js"
   },
   "scripts": {
-    "start": "nodemon app.js"
+    "preinstall": "npm --unsafe-perm i -g jasmine-node@2.0.0-beta4",
+    "test": "jasmine-node spec/docit-spec.js"
   },
   "dependencies": {
     "concat": "^1.0.0",

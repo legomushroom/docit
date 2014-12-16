@@ -31,7 +31,14 @@ describe('docit', function() {
       return expect(__indexOf.call(items, 'docit-pages') >= 0).toBe(true);
     });
   });
-  describe('methods', function() {
+  describe('methods ->', function() {
+    describe('removeSon method ->', function() {
+      return it('should not throw', function() {
+        return expect(function() {
+          return docit.removeSon('no such file name');
+        }).not.toThrow();
+      });
+    });
     describe('isFolder method', function() {
       return it('check if passed path ends with "/"', function() {
         var isFolder1, isFolder2, path1, path2;
@@ -165,39 +172,89 @@ describe('docit', function() {
       });
     });
   });
-  return describe('file listeners', function() {
-    it('should generate map on file add', function(done) {
-      fs.writeFileSync('../docit-pages/colors.html', '<h2>Heading</h2>');
-      return setTimeout(function() {
-        var pages;
-        expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons","colors"]}');
-        pages = jf.readFileSync('./pages.json');
-        expect(JSON.stringify(pages)).toBe('{"pages":["buttons","colors"]}');
-        return done();
-      }, 1000);
+  return describe('file listeners ->', function() {
+    describe('html files ->', function() {
+      it('should generate map on file add', function(done) {
+        fs.writeFileSync('../docit-pages/colors.html', '<h2>Heading</h2>');
+        return setTimeout(function() {
+          var mapStr, pages;
+          mapStr = JSON.stringify(docit.map);
+          expect(mapStr).toBe('{"pages":["buttons","colors"]}');
+          pages = jf.readFileSync('./pages.json');
+          expect(JSON.stringify(pages)).toBe('{"pages":["buttons","colors"]}');
+          return done();
+        }, 1000);
+      });
+      it('should generate map on file delete', function(done) {
+        fs.unlink('../docit-pages/colors.html');
+        return setTimeout(function() {
+          var pages;
+          pages = jf.readFileSync('./pages.json');
+          expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons"]}');
+          expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}');
+          return done();
+        }, 1000);
+      });
+      return it('should generate map on file rename', function(done) {
+        var newName, oldName;
+        oldName = '../docit-pages/buttons.html';
+        newName = '../docit-pages/buttons-new.html';
+        fs.renameSync(oldName, newName);
+        return setTimeout(function() {
+          var pages;
+          pages = jf.readFileSync('./pages.json');
+          expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons-new"]}');
+          expect(JSON.stringify(pages)).toBe('{"pages":["buttons-new"]}');
+          return done();
+        }, 1000);
+      });
     });
-    it('should generate map on file delete', function(done) {
-      fs.unlink('../docit-pages/colors.html');
-      return setTimeout(function() {
-        var pages;
-        pages = jf.readFileSync('./pages.json');
-        expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons"]}');
-        expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}');
-        return done();
-      }, 1000);
-    });
-    return it('should generate map on file rename', function(done) {
-      var newName, oldName;
-      oldName = '../docit-pages/buttons.html';
-      newName = '../docit-pages/buttons-new.html';
-      fs.renameSync(oldName, newName);
-      return setTimeout(function() {
-        var pages;
-        pages = jf.readFileSync('./pages.json');
-        expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons-new"]}');
-        expect(JSON.stringify(pages)).toBe('{"pages":["buttons-new"]}');
-        return done();
-      }, 1000);
+    return describe('jade files ->', function() {
+      it('should compile jade files on add', function(done) {
+        fs.writeFileSync('../docit-pages/type.jade', 'h1 Heading from spec');
+        return setTimeout(function() {
+          var html;
+          html = '';
+          expect(function() {
+            return html = fs.readFileSync('../docit-pages/type.html');
+          }).not.toThrow();
+          expect(html.toString()).toBe('<h1>Heading from spec</h1>');
+          return done();
+        }, 1000);
+      });
+      it('should compile jade files on change', function(done) {
+        fs.writeFileSync('../docit-pages/type.jade', 'h1 Heading from spec #2');
+        return setTimeout(function() {
+          var htmlBuffer;
+          htmlBuffer = fs.readFileSync('../docit-pages/type.html');
+          expect(htmlBuffer.toString()).toBe('<h1>Heading from spec #2</h1>');
+          return done();
+        }, 1000);
+      });
+      it('should remove html file if jade file was removed(removeSon)', function(done) {
+        var filePath;
+        filePath = '../docit-pages/type';
+        fs.unlinkSync("" + filePath + ".jade");
+        return setTimeout(function() {
+          expect(function() {
+            return fs.readFileSync("" + filePath + ".html");
+          }).toThrow();
+          return done();
+        }, 1000);
+      });
+      return it('should rename html file if jade file was renamed', function(done) {
+        var newFile, oldFile;
+        fs.writeFileSync('../docit-pages/forms-1.jade', 'h1 Heading');
+        oldFile = '../docit-pages/forms-1.jade';
+        newFile = '../docit-pages/forms.jade';
+        fs.renameSync(oldFile, newFile);
+        return setTimeout(function() {
+          expect(function() {
+            return fs.readFileSync('../docit-pages/forms.html');
+          }).not.toThrow();
+          return done();
+        }, 1000);
+      });
     });
   });
 });

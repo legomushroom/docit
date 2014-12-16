@@ -29,6 +29,7 @@ DocIt = (function() {
     this.getProjectFiles();
     !this.o.isLivereloadLess && this.createLivereloadServer();
     this.listenPages();
+    this.listenJadePages();
     return this;
   }
 
@@ -57,9 +58,11 @@ DocIt = (function() {
     var prefix;
     this.isDev = this.o.isDev;
     this.projectName = "docit";
+    this.jsonFilePrefix = this.isDev ? './' : '.docit/';
     prefix = this.isDev ? '../' : '';
     this.pagesFolder = "" + prefix + this.projectName + "-pages";
     this.pageFiles = "" + this.pagesFolder + "/**/*.html";
+    this.pageFilesJade = "" + this.pagesFolder + "/**/*";
     return this.removePageFromMap = this.removePageFromMap.bind(this);
   };
 
@@ -112,6 +115,36 @@ DocIt = (function() {
     });
   };
 
+  DocIt.prototype.listenJadePages = function() {
+    var it;
+    it = this;
+    return gaze(this.pageFilesJade, function(err, watcher) {
+      it.watcherJade = watcher;
+      this.on('added', function(filepath) {
+        if (filepath.match(/\.jade/gi)) {
+          return it.compilePage(filepath);
+        }
+      });
+      this.on('changed', function(filepath) {
+        if (filepath.match(/\.jade/gi)) {
+          return it.compilePage(filepath);
+        }
+      });
+      this.on('deleted', function(filepath) {
+        if (filepath.match(/\.jade/gi)) {
+          return it.removeSon(filepath);
+        }
+      });
+      return true;
+    });
+  };
+
+  DocIt.prototype.removeSon = function(filepath) {
+    try {
+      return fs.unlinkSync(filepath.replace('.jade', '.html'));
+    } catch (_error) {}
+  };
+
   DocIt.prototype.parseFolderToMap = function(files) {
     var base, file, fileName, filePathArr, folderName, i, map, _i, _len;
     map = {};
@@ -145,6 +178,15 @@ DocIt = (function() {
       }
     }
     return map;
+  };
+
+  DocIt.prototype.compilePage = function(filepath) {
+    var file, html;
+    file = this.splitFilePath(filepath);
+    if (!file.path.match(/\/partials\//)) {
+      html = jade.renderFile(filepath);
+      return fs.writeFileSync(filepath.replace('.jade', '.html'), html);
+    }
   };
 
   DocIt.prototype.renamePageInMap = function(o) {
@@ -219,8 +261,8 @@ DocIt = (function() {
   DocIt.prototype.writeMap = function(map) {
     var _ref;
     this.map = map;
-    jf.writeFileSync("./pages.json", map);
-    return (_ref = this.server) != null ? _ref.refresh('./pages.json') : void 0;
+    jf.writeFileSync("" + this.jsonFilePrefix + "pages.json", map);
+    return (_ref = this.server) != null ? _ref.refresh('#{@jsonFilePrefix}pages.json') : void 0;
   };
 
   DocIt.prototype.isFolder = function(path) {

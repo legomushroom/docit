@@ -4,13 +4,18 @@ jf   = require 'jsonfile'
 fs   = require 'fs'
 fse  = require 'fs-extra'
 shell = require 'shell'
-
 mkdirp     = require 'mkdirp'
 livereload = require 'livereload'
-
 shell      = require 'shelljs/global'
+recursive  = require  'readdir-recursive'
 
-recursive = require  'readdir-recursive'
+# TODO
+#   .jade compilation
+#   refactor to helpers
+#   search
+#   element page
+#   regression testing
+#   document
 
 class DocIt
   constructor:(@o={})->
@@ -19,6 +24,7 @@ class DocIt
     @getProjectFiles()
     !@o.isLivereloadLess and @createLivereloadServer()
     @listenPages()
+    @listenJadePages()
     return @
 
   createFolders:->
@@ -37,10 +43,12 @@ class DocIt
   vars:->
     @isDev = @o.isDev
     @projectName = "docit"
+    @jsonFilePrefix = if @isDev then './' else '.docit/'
     # for testing purposes
     prefix = if @isDev then '../' else ''
     @pagesFolder = "#{prefix}#{@projectName}-pages"
     @pageFiles    = "#{@pagesFolder}/**/*.html"
+    @pageFilesJade= "#{@pagesFolder}/**/*"
     @removePageFromMap  = @removePageFromMap.bind @
   createLivereloadServer:-> @server = livereload.createServer({ port: 41000 })
   listenPages:->
@@ -62,8 +70,22 @@ class DocIt
           map = it.renamePageInMap options
           it.writeMap map
         true
-      # it.isDev and @on 'all', (e, filepath)-> console.log 'all', e
-      # @on 'all', (e, filepath)-> console.log 'all', e
+  listenJadePages:->
+    it = @
+    gaze @pageFilesJade, (err, watcher) ->
+      it.watcherJade = watcher
+      @on 'added',   (filepath)->
+        if filepath.match /\.jade/gi then it.compilePage filepath
+      @on 'changed', (filepath)->
+        if filepath.match /\.jade/gi then it.compilePage filepath
+      @on 'deleted', (filepath)->
+        if filepath.match /\.jade/gi then it.removeSon filepath
+      true
+
+  removeSon:(filepath)->
+    try
+      fs.unlinkSync filepath.replace '.jade', '.html'
+
   parseFolderToMap:(files)->
     map = {}
     for file, i in files
@@ -90,14 +112,12 @@ class DocIt
           map[folderName] ?= []
           map[folderName].push fileName.replace '.html', ''
     map
-  # compilePage:(filepath)->
-  #   console.log filepath
-  #   file = @splitFilePath(filepath)
-  #   console.log file
-  #   if !file.path.match /\/partials\//
-  #     console.log 'yup'
-  #     jade.renderFile(filepath)
-  #     @server.refresh(filepath)
+  
+  compilePage:(filepath)->
+    file = @splitFilePath(filepath)
+    if !file.path.match /\/partials\//
+      html = jade.renderFile filepath
+      fs.writeFileSync filepath.replace('.jade', '.html'), html
   renamePageInMap:(o)->
     newFilePath = o.newPath; oldFilePath = o.oldPath; map = o.map
     newFile   = @splitFilePath newFilePath
@@ -143,8 +163,8 @@ class DocIt
     map
   writeMap:(map)->
     @map = map
-    jf.writeFileSync "./pages.json", map
-    @server?.refresh('./pages.json')
+    jf.writeFileSync "#{@jsonFilePrefix}pages.json", map
+    @server?.refresh('#{@jsonFilePrefix}pages.json')
 
   isFolder:(path)-> path.substr(path.length-1) is '/'
   getFolder:(path)->
