@@ -1,5 +1,7 @@
-var Helpers,
+var Helpers, fs,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+fs = require('fs');
 
 Helpers = (function() {
   function Helpers(o) {

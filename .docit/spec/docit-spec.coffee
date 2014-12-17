@@ -9,8 +9,6 @@ testHelpers = require './test-helpers'
 fs          = require 'fs'
 jf          = require 'jsonfile'
 
-
-
 testHelpers.cleanProject()
 docit = new DocIt
   isLivereloadLess: true
@@ -22,7 +20,15 @@ describe 'docit', ->
       items           = fs.readdirSync '../'
       expect('css' in items).toBe                   true
       expect('docit-pages'  in items).toBe          true
-  describe 'methods ->', ->
+  describe 'helpers methods ->', ->
+    describe 'splitFilePath method ->', ->
+      it 'should split path to pieces', ->
+        file = h.splitFilePath './docit-pages/forms/form.html'
+
+        expect(file.fileName).toBe('form')
+        expect(file.extension).toBe('jade')
+        expect(file.pathStr).toBe('./docit-pages/forms/form.html')
+
     describe 'removeSon method ->', ->
       it 'should not throw', ->
         expect(-> h.removeSon 'no such file name').not.toThrow()

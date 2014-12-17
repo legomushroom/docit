@@ -33,7 +33,16 @@ describe('docit', function() {
       return expect(__indexOf.call(items, 'docit-pages') >= 0).toBe(true);
     });
   });
-  describe('methods ->', function() {
+  describe('helpers methods ->', function() {
+    describe('splitFilePath method ->', function() {
+      return it('should split path to pieces', function() {
+        var file;
+        file = h.splitFilePath('./docit-pages/forms/form.html');
+        expect(file.fileName).toBe('form');
+        expect(file.extension).toBe('jade');
+        return expect(file.pathStr).toBe('./docit-pages/forms/form.html');
+      });
+    });
     describe('removeSon method ->', function() {
       return it('should not throw', function() {
         return expect(function() {

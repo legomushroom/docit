@@ -29,9 +29,6 @@ DocIt = (function() {
     this.vars();
     this.createFolders();
     this.getProjectFiles();
-    !this.o.isLivereloadLess && this.createLivereloadServer();
-    this.listenPages();
-    this.listenJadePages();
     return this;
   }
 

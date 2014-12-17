@@ -1,3 +1,5 @@
+fs = require 'fs'
+
 class Helpers
   constructor:(@o={})-> @vars()
   vars:-> @projectName = "docit"
