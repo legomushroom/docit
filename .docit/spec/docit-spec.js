@@ -1,4 +1,4 @@
-var DocIt, docit, fs, jf, testHelpers, util,
+var DocIt, docit, fs, h, jf, testHelpers, util,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 util = require('util');
@@ -8,6 +8,8 @@ util.print('\u001b[2J\u001b[0;0H');
 console.log('--------------------- Tests ---------------------');
 
 DocIt = require('../src/docit');
+
+h = require('../src/helpers');
 
 testHelpers = require('./test-helpers');
 
@@ -35,7 +37,7 @@ describe('docit', function() {
     describe('removeSon method ->', function() {
       return it('should not throw', function() {
         return expect(function() {
-          return docit.removeSon('no such file name');
+          return h.removeSon('no such file name');
         }).not.toThrow();
       });
     });
@@ -44,8 +46,8 @@ describe('docit', function() {
         var isFolder1, isFolder2, path1, path2;
         path1 = '/user/bin/pages/';
         path2 = '/user/bin/pages';
-        isFolder1 = docit.isFolder(path1);
-        isFolder2 = docit.isFolder(path2);
+        isFolder1 = h.isFolder(path1);
+        isFolder2 = h.isFolder(path2);
         expect(isFolder1).toBe(true);
         return expect(isFolder2).toBe(false);
       });
@@ -54,10 +56,10 @@ describe('docit', function() {
       return it('should return "pages" if passed path is "docit-pages"', function() {
         var folder, path;
         path = '/user/bin/docit-pages/buttons.html';
-        folder = docit.getFolder(path);
+        folder = h.getFolder(path);
         expect(folder).toBe('pages');
         path = '/user/bin/docit-pages/about-page/buttons.html';
-        folder = docit.getFolder(path);
+        folder = h.getFolder(path);
         return expect(folder).toBe('about-page');
       });
     });
@@ -68,7 +70,7 @@ describe('docit', function() {
         map = {
           pages: []
         };
-        map = docit.addPageToMap({
+        map = h.addPageToMap({
           map: map,
           filepath: path
         });
@@ -82,7 +84,7 @@ describe('docit', function() {
         map = {
           pages: ['type', 'colors']
         };
-        map = docit.removePageFromMap({
+        map = h.removePageFromMap({
           map: map,
           filepath: path
         });
@@ -102,7 +104,7 @@ describe('docit', function() {
           oldPath: oldPath,
           newPath: newPath
         };
-        map = docit.renamePageInMap(options);
+        map = h.renamePageInMap(options);
         return expect(JSON.stringify(map)).toBe('{"pages":["type","forms"]}');
       });
       it('should add page name if folder is empty', function() {
@@ -117,7 +119,7 @@ describe('docit', function() {
           oldPath: oldPath,
           newPath: newPath
         };
-        map = docit.renamePageInMap(options);
+        map = h.renamePageInMap(options);
         return expect(JSON.stringify(map)).toBe('{"pages":["type"]}');
       });
       return it('should add page name if folder doesn\'t contain the page name ', function() {
@@ -132,7 +134,7 @@ describe('docit', function() {
           oldPath: oldPath,
           newPath: newPath
         };
-        map = docit.renamePageInMap(options);
+        map = h.renamePageInMap(options);
         return expect(JSON.stringify(map)).toBe('{"pages":["buttons","type"]}');
       });
     });
@@ -140,14 +142,14 @@ describe('docit', function() {
       it('should parse file and folders to map object', function() {
         var files, filesString, map;
         files = ['/user/bin/docit-pages/type.html', '/user/bin/docit-pages/partials/icon.jade', '/user/bin/docit-pages/about-us/header.html', '/user/bin/docit-pages/about-us/footer.html'];
-        map = docit.parseFolderToMap(files);
+        map = h.parseFolderToMap(files);
         filesString = '{"pages":["type"],"about-us":["header","footer"]}';
         return expect(JSON.stringify(map)).toBe(filesString);
       });
       it('should add only .html files to map', function() {
         var files, filesString, map;
         files = ['/user/bin/docit-pages/type.html', '/user/bin/docit-pages/.DS_store'];
-        map = docit.parseFolderToMap(files);
+        map = h.parseFolderToMap(files);
         filesString = '{"pages":["type"]}';
         return expect(JSON.stringify(map)).toBe(filesString);
       });
@@ -155,7 +157,7 @@ describe('docit', function() {
         var files, filesString, map;
         files = ['/user/bin/docit-pages/type.html', '/user/bin/docit-pages/partials/icon.jade', '/user/bin/docit-pages/about-us/header.html', '/user/bin/docit-pages/about-us/another-folder/footer.html'];
         spyOn(console, 'warn');
-        map = docit.parseFolderToMap(files);
+        map = h.parseFolderToMap(files);
         expect(console.warn).toHaveBeenCalled();
         filesString = '{"pages":["type"],"about-us":["header","footer"]}';
         return expect(JSON.stringify(map)).toBe(filesString);
@@ -165,7 +167,7 @@ describe('docit', function() {
       return it('should write passed map to package.json file', function() {
         var files, map, pages;
         files = ['/user/bin/docit-pages/buttons.html', '/user/bin/docit-pages/partials/icon.jade'];
-        map = docit.parseFolderToMap(files);
+        map = h.parseFolderToMap(files);
         docit.writeMap(map);
         pages = jf.readFileSync('pages.json');
         return expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}');
