@@ -1,7 +1,13 @@
-var Helpers, fs,
+var Helpers, Q, env, fs, trim,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 fs = require('fs');
+
+env = require('jsdom').env;
+
+trim = require('trim');
+
+Q = require('q');
 
 Helpers = (function() {
   function Helpers(o) {
@@ -10,7 +16,10 @@ Helpers = (function() {
   }
 
   Helpers.prototype.vars = function() {
-    return this.projectName = "docit";
+    var jqueryPath;
+    this.projectName = "docit";
+    jqueryPath = './node_modules/jquery/dist/jquery.js';
+    return this.jquerySrc = fs.readFileSync(jqueryPath).toString();
   };
 
   Helpers.prototype.splitFilePath = function(p) {
@@ -161,6 +170,46 @@ Helpers = (function() {
       html = jade.renderFile(filepath);
       return fs.writeFileSync(filepath.replace('.jade', '.html'), html);
     }
+  };
+
+  Helpers.prototype.parseHtmlToJson = function(html) {
+    var dfr;
+    dfr = Q.defer();
+    html = "<html><body>" + html + "</body></html>";
+    env({
+      html: html,
+      src: [this.jquerySrc],
+      done: function(err, window) {
+        var $, $body, $cards, els;
+        $ = window.$;
+        els = [];
+        $body = $('body');
+        $cards = $body.find('card');
+        $cards.each(function(i, card) {
+          var $card, $hash, $name, $tags, cardObj, tags, tagsArr, _ref;
+          cardObj = {};
+          $card = $(card);
+          $name = $card.find('name');
+          cardObj.name = trim($name.text());
+          $name.remove();
+          $hash = $card.find('hash');
+          cardObj.hash = trim($hash.text());
+          $hash.remove();
+          tags = [];
+          $tags = $card.find('tags');
+          tagsArr = $tags != null ? (_ref = $tags.text()) != null ? _ref.split(',') : void 0 : void 0;
+          tagsArr.forEach(function(tag) {
+            return tags.push(trim(tag));
+          });
+          cardObj.tags = tags;
+          $tags.remove();
+          cardObj.html = trim($card.html());
+          return els.push(cardObj);
+        });
+        return dfr.resolve(els);
+      }
+    });
+    return dfr.promise;
   };
 
   return Helpers;

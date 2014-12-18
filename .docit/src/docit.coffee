@@ -9,13 +9,15 @@ livereload = require 'livereload'
 shell      = require 'shelljs/global'
 recursive  = require  'readdir-recursive'
 
+# trim = require 'trim' REMOVE
+
 h = require './helpers'
 
 # TODO
 #   search
 #   element page
 #   regression testing
-#   document
+#   document + website
 
 class DocIt
   constructor:(@o={})->
@@ -44,6 +46,13 @@ class DocIt
     if !("#{@projectName}-pages" in items)
       fromDir = "#{nBaseurl}./project-folders/docit-pages/"
       fse.copySync fromDir, "#{@baseUrl}docit-pages"
+
+    fromFile = "#{nBaseurl}./index.html"
+    toFile   = "#{@baseUrl}index.html"
+    fs.createReadStream(fromFile).pipe(fs.createWriteStream(toFile))
+    # fse.copySync fromDir, "#{@baseUrl}"
+
+
   getProjectFiles:->
     files = recursive.fileSync "#{@baseUrl}docit-pages/"
     map = h.parseFolderToMap files

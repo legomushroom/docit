@@ -22,12 +22,17 @@
   "dependencies": {
     "concat": "^1.0.0",
     "fs-extra": "^0.13.0",
+    "fswin": "^2.14.1109",
     "gaze": "^0.6.4",
     "jade": "1.8.1",
+    "jquery": "^2.1.2",
+    "jsdom": "^1.5.0",
     "jsonfile": "^2.0.0",
     "livereload": "^0.3.4",
+    "q": "^1.1.2",
     "readdir-recursive": "0.0.4",
     "recursive-readdir": "^1.2.0",
+    "trim": "0.0.1",
     "watch": "^0.13.0",
     "watchr": "^2.4.11"
   },

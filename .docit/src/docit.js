@@ -47,7 +47,7 @@ DocIt = (function() {
   };
 
   DocIt.prototype.createFolders = function() {
-    var fromDir, items, nBaseurl, _ref;
+    var fromDir, fromFile, items, nBaseurl, toFile, _ref;
     nBaseurl = this.isDev ? './' : '.docit/';
     this.baseUrl = this.isDev ? '../' : './';
     items = fs.readdirSync(this.baseUrl);
@@ -56,8 +56,11 @@ DocIt = (function() {
     }
     if (!(_ref = "" + this.projectName + "-pages", __indexOf.call(items, _ref) >= 0)) {
       fromDir = "" + nBaseurl + "./project-folders/docit-pages/";
-      return fse.copySync(fromDir, "" + this.baseUrl + "docit-pages");
+      fse.copySync(fromDir, "" + this.baseUrl + "docit-pages");
     }
+    fromFile = "" + nBaseurl + "./index.html";
+    toFile = "" + this.baseUrl + "index.html";
+    return fs.createReadStream(fromFile).pipe(fs.createWriteStream(toFile));
   };
 
   DocIt.prototype.getProjectFiles = function() {

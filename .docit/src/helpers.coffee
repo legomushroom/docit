@@ -1,8 +1,17 @@
 fs = require 'fs'
+env    = require('jsdom').env
+
+trim = require 'trim'
+
+Q = require 'q'
 
 class Helpers
   constructor:(@o={})-> @vars()
-  vars:-> @projectName = "docit"
+  vars:->
+    @projectName = "docit"
+    jqueryPath = './node_modules/jquery/dist/jquery.js'
+    @jquerySrc = fs.readFileSync(jqueryPath).toString()
+
   splitFilePath:(p)->
     pathArr   = p.split("/")
     fileName  = pathArr[pathArr.length - 1]
@@ -95,5 +104,31 @@ class Helpers
       html = jade.renderFile filepath
       fs.writeFileSync filepath.replace('.jade', '.html'), html
 
+  parseHtmlToJson:(html)->
+    dfr = Q.defer()
+    html = "<html><body>#{html}</body></html>"
+    env
+      html: html
+      src: [@jquerySrc]
+      done: (err, window)->
+        $ = window.$
+        els = []
+        $body = $('body')
+        $cards = $body.find('card')
+        $cards.each (i, card)->
+          cardObj = {}
+          $card = $(card)
+          $name = $card.find('name')
+          cardObj.name = trim $name.text(); $name.remove()
+          $hash = $card.find('hash')
+          cardObj.hash = trim $hash.text(); $hash.remove()
+          tags = []; $tags = $card.find('tags')
+          tagsArr = $tags?.text()?.split ','
+          tagsArr.forEach (tag)-> tags.push trim(tag)
+          cardObj.tags = tags; $tags.remove()
+          cardObj.html = trim $card.html()
+          els.push cardObj
+        dfr.resolve(els)
+    dfr.promise
 
 module.exports = new Helpers
