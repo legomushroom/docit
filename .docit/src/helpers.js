@@ -1,7 +1,9 @@
-var Helpers, Q, env, fs, trim,
+var Helpers, Q, env, fs, jade, trim,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 fs = require('fs');
+
+jade = require('jade');
 
 env = require('jsdom').env;
 

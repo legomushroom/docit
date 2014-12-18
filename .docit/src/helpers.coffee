@@ -1,9 +1,8 @@
-fs = require 'fs'
-env    = require('jsdom').env
-
+fs   = require 'fs'
+jade = require 'jade'
+env  = require('jsdom').env
 trim = require 'trim'
-
-Q = require 'q'
+Q    = require 'q'
 
 class Helpers
   constructor:(@o={})-> @vars()
