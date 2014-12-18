@@ -156,7 +156,7 @@ Helpers = (function() {
 
   Helpers.prototype.compilePage = function(filepath) {
     var file, html;
-    file = h.splitFilePath(filepath);
+    file = this.splitFilePath(filepath);
     if (!file.path.match(/\/partials\//)) {
       html = jade.renderFile(filepath);
       return fs.writeFileSync(filepath.replace('.jade', '.html'), html);

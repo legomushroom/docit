@@ -26,8 +26,8 @@ describe 'docit', ->
         file = h.splitFilePath './docit-pages/forms/form.html'
 
         expect(file.fileName).toBe('form')
-        expect(file.extension).toBe('jade')
-        expect(file.pathStr).toBe('./docit-pages/forms/form.html')
+        expect(file.extension).toBe('html')
+        expect(file.path).toBe('./docit-pages/forms/')
 
     describe 'removeSon method ->', ->
       it 'should not throw', ->

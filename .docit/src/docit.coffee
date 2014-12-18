@@ -22,9 +22,9 @@ class DocIt
     @vars()
     @createFolders()
     @getProjectFiles()
-    # !@o.isLivereloadLess and @createLivereloadServer()
-    # @listenPages()
-    # @listenJadePages()
+    !@o.isLivereloadLess and @createLivereloadServer()
+    @listenPages()
+    @listenJadePages()
     return @
   vars:->
     @isDev = @o.isDev

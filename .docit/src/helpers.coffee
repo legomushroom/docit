@@ -90,7 +90,7 @@ class Helpers
     else folder.push fileName
     map
   compilePage:(filepath)->
-    file = h.splitFilePath(filepath)
+    file = @splitFilePath(filepath)
     if !file.path.match /\/partials\//
       html = jade.renderFile filepath
       fs.writeFileSync filepath.replace('.jade', '.html'), html

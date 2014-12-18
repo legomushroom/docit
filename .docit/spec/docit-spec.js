@@ -39,8 +39,8 @@ describe('docit', function() {
         var file;
         file = h.splitFilePath('./docit-pages/forms/form.html');
         expect(file.fileName).toBe('form');
-        expect(file.extension).toBe('jade');
-        return expect(file.pathStr).toBe('./docit-pages/forms/form.html');
+        expect(file.extension).toBe('html');
+        return expect(file.path).toBe('./docit-pages/forms/');
       });
     });
     describe('removeSon method ->', function() {
