@@ -94,7 +94,10 @@ DocIt = (function() {
           filepath: filepath,
           map: it.map
         });
-        return it.writeMap(map);
+        it.writeMap(map);
+        if (file.extension === '') {
+          return it.watcher.add(filepath);
+        }
       });
       this.on('deleted', function(filepath) {
         var file, map;

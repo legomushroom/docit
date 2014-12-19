@@ -67,8 +67,9 @@ class DocIt
         return if !(file.extension is 'html')
         map = h.addPageToMap filepath: filepath, map: it.map
         it.writeMap map
-        # if file.extension is ''
-        #   it.watcher.close(); it.listenPages()
+
+        if file.extension is ''
+          it.watcher.add filepath
 
       @on 'deleted', (filepath)->
         file = h.splitFilePath filepath

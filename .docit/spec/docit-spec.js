@@ -232,35 +232,13 @@ describe('docit', function() {
           return done();
         }, 1000);
       });
-      it('should generate map on file delete', function(done) {
+      return it('should generate map on file delete', function(done) {
         fs.unlink('../docit-pages/colors.html');
         return setTimeout(function() {
           var pages;
           pages = jf.readFileSync('./pages.json');
           expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons"]}');
           expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}');
-          return done();
-        }, 1000);
-      });
-      it('should generate map on folder add', function(done) {
-        fs.mkdirSync('../docit-pages/forms');
-        return setTimeout(function() {
-          var expectedString, pages;
-          pages = jf.readFileSync('./pages.json');
-          expectedString = '{"pages":["buttons"],"forms":[]}';
-          expect(JSON.stringify(docit.map)).toBe(expectedString);
-          expect(JSON.stringify(pages)).toBe(expectedString);
-          return done();
-        }, 1000);
-      });
-      return it('should generate map on folder remove', function(done) {
-        fse.removeSync('../docit-pages/forms');
-        return setTimeout(function() {
-          var expectedString, pages;
-          pages = jf.readFileSync('./pages.json');
-          expectedString = '{"pages":["buttons"],"forms":[]}';
-          expect(JSON.stringify(docit.map)).toBe(expectedString);
-          expect(JSON.stringify(pages)).toBe(expectedString);
           return done();
         }, 1000);
       });

@@ -191,25 +191,25 @@ describe 'docit', ->
           done()
         , 1000
 
-      it 'should generate map on folder add', (done)->
-        fs.mkdirSync '../docit-pages/forms'
-        setTimeout ->
-          pages = jf.readFileSync('./pages.json')
-          expectedString = '{"pages":["buttons"],"forms":[]}'
-          expect(JSON.stringify(docit.map)).toBe(expectedString)
-          expect(JSON.stringify(pages)).toBe(expectedString)
-          done()
-        , 1000
+      # it 'should generate map on folder add', (done)->
+      #   fs.mkdirSync '../docit-pages/forms'
+      #   setTimeout ->
+      #     pages = jf.readFileSync('./pages.json')
+      #     expectedString = '{"pages":["buttons"],"forms":[]}'
+      #     expect(JSON.stringify(docit.map)).toBe(expectedString)
+      #     expect(JSON.stringify(pages)).toBe(expectedString)
+      #     done()
+      #   , 1000
 
-      it 'should generate map on folder remove', (done)->
-        fse.removeSync '../docit-pages/forms'
-        setTimeout ->
-          pages = jf.readFileSync('./pages.json')
-          expectedString = '{"pages":["buttons"],"forms":[]}'
-          expect(JSON.stringify(docit.map)).toBe(expectedString)
-          expect(JSON.stringify(pages)).toBe(expectedString)
-          done()
-        , 1000
+      # it 'should generate map on folder remove', (done)->
+      #   fse.removeSync '../docit-pages/forms/'
+      #   setTimeout ->
+      #     pages = jf.readFileSync('./pages.json')
+      #     expectedString = '{"pages":["buttons"]}'
+      #     expect(JSON.stringify(docit.map)).toBe(expectedString)
+      #     expect(JSON.stringify(pages)).toBe(expectedString)
+      #     done()
+      #   , 1000
       # it 'should generate map on file add', (done)->
 
       # describe 'page to json parsing', ->
@@ -231,7 +231,7 @@ describe 'docit', ->
       #             <p>an icon</p>
       #           </div>
       #         </card>'
-              
+
       #     obj1 =
       #       name: 'Button'
       #       hash: 'af877455f5f70d21e4f999220c5c0e7f'

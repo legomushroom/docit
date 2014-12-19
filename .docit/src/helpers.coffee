@@ -10,7 +10,7 @@ class Helpers
     @projectName = "docit"
     prefix = '../'
     @pagesFolder = "#{prefix}#{@projectName}-pages"
-    jqueryPath = './node_modules/jquery/dist/jquery.js'
+    jqueryPath = '.docit/node_modules/jquery/dist/jquery.js'
     @jquerySrc = fs.readFileSync(jqueryPath).toString()
   splitFilePath:(p)->
     pathArr   = p.split("/")
