@@ -1,4 +1,4 @@
-var DocIt, docit, fs, h, jf, testHelpers, util,
+var DocIt, docit, fs, fse, h, jf, testHelpers, util,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 util = require('util');
@@ -18,6 +18,8 @@ h = require('../src/helpers');
 testHelpers = require('./test-helpers');
 
 fs = require('fs');
+
+fse = require('fs-extra');
 
 jf = require('jsonfile');
 
@@ -73,7 +75,8 @@ describe('docit', function() {
         file = h.splitFilePath('./docit-pages/forms/form.html');
         expect(file.fileName).toBe('form');
         expect(file.extension).toBe('html');
-        return expect(file.path).toBe('./docit-pages/forms/');
+        expect(file.path).toBe('./docit-pages/forms/');
+        return expect(file.folder).toBe('forms');
       });
     });
     describe('removeSon method ->', function() {
@@ -239,16 +242,25 @@ describe('docit', function() {
           return done();
         }, 1000);
       });
-      return it('should generate map on file rename', function(done) {
-        var newName, oldName;
-        oldName = '../docit-pages/buttons.html';
-        newName = '../docit-pages/buttons-new.html';
-        fs.renameSync(oldName, newName);
+      it('should generate map on folder add', function(done) {
+        fs.mkdirSync('../docit-pages/forms');
         return setTimeout(function() {
-          var pages;
+          var expectedString, pages;
           pages = jf.readFileSync('./pages.json');
-          expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons-new"]}');
-          expect(JSON.stringify(pages)).toBe('{"pages":["buttons-new"]}');
+          expectedString = '{"pages":["buttons"],"forms":[]}';
+          expect(JSON.stringify(docit.map)).toBe(expectedString);
+          expect(JSON.stringify(pages)).toBe(expectedString);
+          return done();
+        }, 1000);
+      });
+      return it('should generate map on folder remove', function(done) {
+        fse.removeSync('../docit-pages/forms');
+        return setTimeout(function() {
+          var expectedString, pages;
+          pages = jf.readFileSync('./pages.json');
+          expectedString = '{"pages":["buttons"],"forms":[]}';
+          expect(JSON.stringify(docit.map)).toBe(expectedString);
+          expect(JSON.stringify(pages)).toBe(expectedString);
           return done();
         }, 1000);
       });

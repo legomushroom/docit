@@ -8,19 +8,22 @@ class Helpers
   constructor:(@o={})-> @vars()
   vars:->
     @projectName = "docit"
+    prefix = '../'
+    @pagesFolder = "#{prefix}#{@projectName}-pages"
     jqueryPath = './node_modules/jquery/dist/jquery.js'
     @jquerySrc = fs.readFileSync(jqueryPath).toString()
-
   splitFilePath:(p)->
     pathArr   = p.split("/")
     fileName  = pathArr[pathArr.length - 1]
     extension = fileName.split('.')
     extension = extension[extension.length-1]
     path      = pathArr.slice(0, pathArr.length - 1)
+    folder    = pathArr[pathArr.length-2]
     pathStr   = path.join("/") + "/"
     regex     = new RegExp "\.#{extension}", 'gi'
     file =
       path:       pathStr
+      folder:     folder
       fileName:   fileName.replace regex, ''
       extension:  extension
   renamePageInMap:(o)->
@@ -91,11 +94,14 @@ class Helpers
   addPageToMap:(o)->
     map = o.map; filepath = o.filepath
     file   = @splitFilePath filepath
-    folder = @getFolder filepath
+    folderName = @getFolder filepath
     return if folder is "#{@pagesFolder}/partials/"
-    folder = map[folder]; fileName = file.fileName
-    if fileName in folder then return
-    else folder.push fileName
+    folder = map[folderName]; fileName = file.fileName
+
+    if folder and fileName in folder then return
+    else
+      map[folderName] ?= []
+      fileName and map[folderName].push fileName
     map
   compilePage:(filepath)->
     file = @splitFilePath(filepath)

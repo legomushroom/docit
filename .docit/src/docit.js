@@ -42,7 +42,7 @@ DocIt = (function() {
     this.jsonFilePrefix = this.isDev ? './' : '.docit/';
     prefix = this.isDev ? '../' : '';
     this.pagesFolder = "" + prefix + this.projectName + "-pages";
-    this.pageFiles = "" + this.pagesFolder + "/**/*.html";
+    this.pageFiles = "" + this.pagesFolder + "/**/*";
     return this.pageFilesJade = "" + this.pagesFolder + "/**/*";
   };
 
@@ -81,8 +81,15 @@ DocIt = (function() {
     it = this;
     return gaze(this.pageFiles, function(err, watcher) {
       it.watcher = watcher;
+      this.relative(function(err, files) {
+        return console.log(files);
+      });
       this.on('added', function(filepath) {
-        var map;
+        var file, map;
+        file = h.splitFilePath(filepath);
+        if (!(file.extension === 'html')) {
+          return;
+        }
         map = h.addPageToMap({
           filepath: filepath,
           map: it.map
@@ -90,21 +97,29 @@ DocIt = (function() {
         return it.writeMap(map);
       });
       this.on('deleted', function(filepath) {
-        var map;
+        var file, map;
+        file = h.splitFilePath(filepath);
+        if (!(file.extension === 'html')) {
+          return;
+        }
         map = h.removePageFromMap({
           filepath: filepath,
           map: it.map
         });
         return it.writeMap(map);
       });
-      return this.on('renamed', function(filepath, oldpath) {
-        var map, options;
+      this.on('renamed', function(filepath, oldpath) {
+        var file, map, options;
+        file = h.splitFilePath(filepath);
+        if (!(file.extension === 'html')) {
+          return;
+        }
         if (filepath.match(/\.trash/gi)) {
           map = h.removePageFromMap({
             filepath: oldpath,
             map: it.map
           });
-          it.writeMap(map);
+          return it.writeMap(map);
         } else {
           options = {
             newPath: filepath,
@@ -112,9 +127,11 @@ DocIt = (function() {
             map: it.map
           };
           map = h.renamePageInMap(options);
-          it.writeMap(map);
+          return it.writeMap(map);
         }
-        return true;
+      });
+      return this.on('all', function(e, filepath) {
+        return console.log(e, filepath);
       });
     });
   };
@@ -140,6 +157,24 @@ DocIt = (function() {
         }
       });
       return true;
+    });
+  };
+
+  DocIt.prototype.parsePageToJson = function(filepath) {
+    var contents, file, json;
+    file = h.splitFilePath(filepath);
+    contents = fs.readFileSync(filepath);
+    json = {};
+    return h.parseHtmlToJson(contents.toString()).then(function(json) {
+      var folder;
+      json = json;
+      folder = file.folder === 'docit-pages' ? '' : "" + file.folder + "/";
+      console.log('folder', folder, file.folder, file.fileName);
+      if (folder) {
+        console.log('create dir', folder);
+        fs.mkdirSync("./json-pages/" + folder);
+      }
+      return jf.writeFileSync("./json-pages/" + folder + file.fileName + ".json", json);
     });
   };
 

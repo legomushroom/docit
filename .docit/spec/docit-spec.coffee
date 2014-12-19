@@ -8,6 +8,7 @@ DocIt       = require '../src/docit'
 h           = require '../src/helpers'
 testHelpers = require './test-helpers'
 fs          = require 'fs'
+fse         = require 'fs-extra'
 jf          = require 'jsonfile'
 # fswin       = require 'fswin'
 
@@ -65,18 +66,17 @@ describe 'docit', ->
           html: '<div class=\"icon\"> <p>whis is</p> <p>an icon</p> </div>'
         string2 = JSON.stringify(obj2)
         expectedString = "[#{string1},#{string2}]"
-        
+
         h.parseHtmlToJson(html).then (json)->
           expect(JSON.stringify(json)).toBe(expectedString)
           done()
-
-
     describe 'splitFilePath method ->', ->
       it 'should split path to pieces', ->
         file = h.splitFilePath './docit-pages/forms/form.html'
         expect(file.fileName).toBe('form')
         expect(file.extension).toBe('html')
         expect(file.path).toBe('./docit-pages/forms/')
+        expect(file.folder).toBe('forms')
     describe 'removeSon method ->', ->
       it 'should not throw', ->
         expect(-> h.removeSon 'no such file name').not.toThrow()
@@ -190,16 +190,69 @@ describe 'docit', ->
           expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}')
           done()
         , 1000
-      it 'should generate map on file rename', (done)->
-        oldName = '../docit-pages/buttons.html'
-        newName = '../docit-pages/buttons-new.html'
-        fs.renameSync oldName, newName
+
+      it 'should generate map on folder add', (done)->
+        fs.mkdirSync '../docit-pages/forms'
         setTimeout ->
           pages = jf.readFileSync('./pages.json')
-          expect(JSON.stringify(docit.map)).toBe('{"pages":["buttons-new"]}')
-          expect(JSON.stringify(pages)).toBe('{"pages":["buttons-new"]}')
+          expectedString = '{"pages":["buttons"],"forms":[]}'
+          expect(JSON.stringify(docit.map)).toBe(expectedString)
+          expect(JSON.stringify(pages)).toBe(expectedString)
           done()
         , 1000
+
+      it 'should generate map on folder remove', (done)->
+        fse.removeSync '../docit-pages/forms'
+        setTimeout ->
+          pages = jf.readFileSync('./pages.json')
+          expectedString = '{"pages":["buttons"],"forms":[]}'
+          expect(JSON.stringify(docit.map)).toBe(expectedString)
+          expect(JSON.stringify(pages)).toBe(expectedString)
+          done()
+        , 1000
+      # it 'should generate map on file add', (done)->
+
+      # describe 'page to json parsing', ->
+      #   it 'should generate json file on html file add', (done)->
+      #     dir = '../docit-pages/forms'
+      #     fs.mkdirSync dir
+      #     fs.writeFileSync "#{dir}/icons.html", '<card>
+      #           <name>Button</name>
+      #           <tags>buttons, press, thin shadow </tags>
+      #           <hash>af877455f5f70d21e4f999220c5c0e7f</hash>
+      #           <div class=\"button\"></div>
+      #         </card>
+      #         <card>
+      #           <name>icon</name>
+      #           <tags>icons, social, facebook</tags>
+      #           <hash>0380d4f55cd58c7717e4dc4662b38f99</hash>
+      #           <div class=\"icon\">
+      #             <p>whis is</p>
+      #             <p>an icon</p>
+      #           </div>
+      #         </card>'
+              
+      #     obj1 =
+      #       name: 'Button'
+      #       hash: 'af877455f5f70d21e4f999220c5c0e7f'
+      #       tags: ['buttons', 'press', 'thin shadow']
+      #       html: '<div class=\"button\"></div>'
+      #     string1 = JSON.stringify(obj1)
+      #     obj2 =
+      #       name: 'icon'
+      #       hash: '0380d4f55cd58c7717e4dc4662b38f99'
+      #       tags: ['icons','social','facebook']
+      #       html: '<div class=\"icon\"> <p>whis is</p> <p>an icon</p> </div>'
+      #     string2 = JSON.stringify(obj2)
+      #     expectedString = "[#{string1},#{string2}]"
+
+      #     setTimeout =>
+      #       icons = jf.readFileSync('./json-pages/forms/icons.json')
+      #       expect(JSON.stringify(icons)).toBe(expectedString)
+      #       done()
+      #     , 1000
+
+        # expect()
 
     describe 'jade files ->', ()->
       it 'should compile jade files on add', (done)->

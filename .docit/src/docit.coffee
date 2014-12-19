@@ -9,11 +9,12 @@ livereload = require 'livereload'
 shell      = require 'shelljs/global'
 recursive  = require  'readdir-recursive'
 
-# trim = require 'trim' REMOVE
+# trim = require 'trim'
 
 h = require './helpers'
 
 # TODO
+#   BUG: it doesnt react on new folder/file
 #   search
 #   element page
 #   regression testing
@@ -35,7 +36,7 @@ class DocIt
     # for testing purposes
     prefix = if @isDev then '../' else ''
     @pagesFolder = "#{prefix}#{@projectName}-pages"
-    @pageFiles    = "#{@pagesFolder}/**/*.html"
+    @pageFiles    = "#{@pagesFolder}/**/*"
     @pageFilesJade= "#{@pagesFolder}/**/*"
   createFolders:->
     nBaseurl = if @isDev then './' else '.docit/'
@@ -51,8 +52,6 @@ class DocIt
     toFile   = "#{@baseUrl}index.html"
     fs.createReadStream(fromFile).pipe(fs.createWriteStream(toFile))
     # fse.copySync fromDir, "#{@baseUrl}"
-
-
   getProjectFiles:->
     files = recursive.fileSync "#{@baseUrl}docit-pages/"
     map = h.parseFolderToMap files
@@ -62,13 +61,23 @@ class DocIt
     it = @
     gaze @pageFiles, (err, watcher) ->
       it.watcher = watcher
+      @relative (err, files)-> console.log files
       @on 'added',   (filepath)->
+        file = h.splitFilePath filepath
+        return if !(file.extension is 'html')
         map = h.addPageToMap filepath: filepath, map: it.map
         it.writeMap map
+        # if file.extension is ''
+        #   it.watcher.close(); it.listenPages()
+
       @on 'deleted', (filepath)->
+        file = h.splitFilePath filepath
+        return if !(file.extension is 'html')
         map = h.removePageFromMap filepath: filepath, map: it.map
         it.writeMap map
       @on 'renamed', (filepath, oldpath)->
+        file = h.splitFilePath filepath
+        return if !(file.extension is 'html')
         if filepath.match /\.trash/gi
           map = h.removePageFromMap filepath: oldpath, map: it.map
           it.writeMap map
@@ -76,7 +85,10 @@ class DocIt
           options = newPath: filepath, oldPath: oldpath, map: it.map
           map = h.renamePageInMap options
           it.writeMap map
-        true
+      
+      @on 'all', (e, filepath)->
+        console.log e, filepath
+
   listenJadePages:->
     it = @
     gaze @pageFilesJade, (err, watcher) ->
@@ -88,6 +100,25 @@ class DocIt
       @on 'deleted', (filepath)->
         if filepath.match /\.jade/gi then h.removeSon filepath
       true
+
+  parsePageToJson:(filepath)->
+    file = h.splitFilePath filepath
+    contents = fs.readFileSync filepath
+
+    json = {}
+    h.parseHtmlToJson(contents.toString())
+      .then (json)->
+        json = json
+        folder = if file.folder is 'docit-pages' then '' else "#{file.folder}/"
+
+        console.log 'folder', folder, file.folder, file.fileName
+        if folder
+          console.log 'create dir', folder
+          fs.mkdirSync "./json-pages/#{folder}"
+        jf.writeFileSync  "./json-pages/#{folder}#{file.fileName}.json", json
+
+    # console.log file
+
   writeMap:(map)->
     @map = map
     jf.writeFileSync "#{@jsonFilePrefix}pages.json", map

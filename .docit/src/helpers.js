@@ -18,23 +18,27 @@ Helpers = (function() {
   }
 
   Helpers.prototype.vars = function() {
-    var jqueryPath;
+    var jqueryPath, prefix;
     this.projectName = "docit";
+    prefix = '../';
+    this.pagesFolder = "" + prefix + this.projectName + "-pages";
     jqueryPath = './node_modules/jquery/dist/jquery.js';
     return this.jquerySrc = fs.readFileSync(jqueryPath).toString();
   };
 
   Helpers.prototype.splitFilePath = function(p) {
-    var extension, file, fileName, path, pathArr, pathStr, regex;
+    var extension, file, fileName, folder, path, pathArr, pathStr, regex;
     pathArr = p.split("/");
     fileName = pathArr[pathArr.length - 1];
     extension = fileName.split('.');
     extension = extension[extension.length - 1];
     path = pathArr.slice(0, pathArr.length - 1);
+    folder = pathArr[pathArr.length - 2];
     pathStr = path.join("/") + "/";
     regex = new RegExp("\." + extension, 'gi');
     return file = {
       path: pathStr,
+      folder: folder,
       fileName: fileName.replace(regex, ''),
       extension: extension
     };
@@ -147,20 +151,23 @@ Helpers = (function() {
   };
 
   Helpers.prototype.addPageToMap = function(o) {
-    var file, fileName, filepath, folder, map;
+    var file, fileName, filepath, folder, folderName, map;
     map = o.map;
     filepath = o.filepath;
     file = this.splitFilePath(filepath);
-    folder = this.getFolder(filepath);
+    folderName = this.getFolder(filepath);
     if (folder === ("" + this.pagesFolder + "/partials/")) {
       return;
     }
-    folder = map[folder];
+    folder = map[folderName];
     fileName = file.fileName;
-    if (__indexOf.call(folder, fileName) >= 0) {
+    if (folder && __indexOf.call(folder, fileName) >= 0) {
       return;
     } else {
-      folder.push(fileName);
+      if (map[folderName] == null) {
+        map[folderName] = [];
+      }
+      fileName && map[folderName].push(fileName);
     }
     return map;
   };
