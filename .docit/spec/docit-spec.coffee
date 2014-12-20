@@ -1,7 +1,6 @@
 util = require 'util'
 util.print '\u001b[2J\u001b[0;0H'
 process.on 'uncaughtException',(error)->console.log(error.stack)
-
 console.log '--------------------- Tests ---------------------'
 
 DocIt       = require '../src/docit'
@@ -185,6 +184,7 @@ describe 'docit', ->
         pages = jf.readFileSync('pages.json')
         expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}')
   
+  return if !process.env.isTravis
 
   describe 'file listeners ->', ()->
     describe 'html files ->', ()->

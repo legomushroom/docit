@@ -243,6 +243,9 @@ describe('docit', function() {
       });
     });
   });
+  if (!process.env.isTravis) {
+    return;
+  }
   describe('file listeners ->', function() {
     return describe('html files ->', function() {
       it('should generate map on file add', function(done) {
