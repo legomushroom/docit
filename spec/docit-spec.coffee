@@ -184,8 +184,11 @@ describe 'docit', ->
         pages = jf.readFileSync('pages.json')
         expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}')
   
-  return if !process.env.isTravis
 
+  # # travis ci doesn't allow to work with file system
+  # # so return if isTravis variable is set at env object
+  # # this variable is specified at .travis.yml file
+  # return if !process.env.isTravis
   describe 'file listeners ->', ()->
     describe 'html files ->', ()->
       it 'should generate map on file add', (done)->
