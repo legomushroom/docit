@@ -1,0 +1,55 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'shama/gaze' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.33
+4 warn package.json docit@0.1.1 No description
+5 warn package.json docit@0.1.1 No README data
+6 warn package.json trim@0.0.1 No repository field.
+7 verbose readDependencies using package.json deps
+8 verbose cache add [ 'shama/gaze', null ]
+9 verbose cache add name=undefined spec="shama/gaze" args=["shama/gaze",null]
+10 verbose parsed url { protocol: null,
+10 verbose parsed url   slashes: null,
+10 verbose parsed url   auth: null,
+10 verbose parsed url   host: null,
+10 verbose parsed url   port: null,
+10 verbose parsed url   hostname: null,
+10 verbose parsed url   hash: null,
+10 verbose parsed url   search: null,
+10 verbose parsed url   query: null,
+10 verbose parsed url   pathname: 'shama/gaze',
+10 verbose parsed url   path: 'shama/gaze',
+10 verbose parsed url   href: 'shama/gaze' }
+11 silly lockFile 426f22d1-shama-gaze shama/gaze
+12 verbose lock shama/gaze /Users/mac/.npm/426f22d1-shama-gaze.lock
+13 info maybeGithub Attempting shama/gaze from git://github.com/shama/gaze
+14 silly lockFile 7f14cf04-git-github-com-shama-gaze git://github.com/shama/gaze
+15 verbose lock git://github.com/shama/gaze /Users/mac/.npm/7f14cf04-git-github-com-shama-gaze.lock
+16 verbose addRemoteGit [ 'git://github.com/shama/gaze', 'master' ]
+17 silly lockFile 7f14cf04-git-github-com-shama-gaze git://github.com/shama/gaze
+18 silly lockFile 7f14cf04-git-github-com-shama-gaze git://github.com/shama/gaze
+19 info maybeGithub Attempting shama/gaze from git+ssh://git@github.com:shama/gaze
+20 silly lockFile 210f3a33-git-github-com-shama-gaze git@github.com:shama/gaze
+21 verbose lock git@github.com:shama/gaze /Users/mac/.npm/210f3a33-git-github-com-shama-gaze.lock
+22 verbose addRemoteGit [ 'git@github.com:shama/gaze', 'master' ]
+23 silly lockFile 210f3a33-git-github-com-shama-gaze git@github.com:shama/gaze
+24 silly lockFile 210f3a33-git-github-com-shama-gaze git@github.com:shama/gaze
+25 silly lockFile 426f22d1-shama-gaze shama/gaze
+26 silly lockFile 426f22d1-shama-gaze shama/gaze
+27 error addLocal Could not install shama/gaze
+28 error Error: ENOENT, stat 'shama/gaze'
+29 error If you need help, you may report this *entire* log,
+29 error including the npm and node versions, at:
+29 error     <http://github.com/npm/npm/issues>
+30 error System Darwin 14.0.0
+31 error command "/usr/local/bin/node" "/usr/local/bin/npm" "install" "shama/gaze"
+32 error cwd /Applications/MAMP/htdocs/docit/.docit
+33 error node -v v0.10.33
+34 error npm -v 1.4.28
+35 error path shama/gaze
+36 error code ENOENT
+37 error errno 34
+38 verbose exit [ 34, true ]

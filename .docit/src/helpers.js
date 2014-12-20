@@ -22,7 +22,7 @@ Helpers = (function() {
     this.projectName = "docit";
     prefix = '../';
     this.pagesFolder = "" + prefix + this.projectName + "-pages";
-    jqueryPath = '.docit/node_modules/jquery/dist/jquery.js';
+    jqueryPath = './node_modules/jquery/dist/jquery.js';
     return this.jquerySrc = fs.readFileSync(jqueryPath).toString();
   };
 

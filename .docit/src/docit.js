@@ -38,11 +38,12 @@ DocIt = (function() {
   DocIt.prototype.vars = function() {
     var prefix;
     this.isDev = this.o.isDev;
+    this.map = {};
     this.projectName = "docit";
     this.jsonFilePrefix = this.isDev ? './' : '.docit/';
     prefix = this.isDev ? '../' : '';
     this.pagesFolder = "" + prefix + this.projectName + "-pages";
-    this.pageFiles = "" + this.pagesFolder + "/**/*";
+    this.pageFiles = "" + this.pagesFolder + "/**/*.html";
     return this.pageFilesJade = "" + this.pagesFolder + "/**/*";
   };
 

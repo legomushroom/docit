@@ -31,12 +31,13 @@ class DocIt
     return @
   vars:->
     @isDev = @o.isDev
+    @map = {}
     @projectName = "docit"
     @jsonFilePrefix = if @isDev then './' else '.docit/'
     # for testing purposes
     prefix = if @isDev then '../' else ''
     @pagesFolder = "#{prefix}#{@projectName}-pages"
-    @pageFiles    = "#{@pagesFolder}/**/*"
+    @pageFiles    = "#{@pagesFolder}/**/*.html"
     @pageFilesJade= "#{@pagesFolder}/**/*"
   createFolders:->
     nBaseurl = if @isDev then './' else '.docit/'
