@@ -95,14 +95,15 @@ class Helpers
     map = o.map; filepath = o.filepath
     file   = @splitFilePath filepath
     folderName = @getFolder filepath
-    return if folder is "#{@pagesFolder}/partials/"
+    return map if file.folder is "partials"
     folder = map[folderName]; fileName = file.fileName
 
-    if folder and fileName in folder then return
+    if folder and fileName in folder then return map
     else
       map[folderName] ?= []
       fileName and map[folderName].push fileName
     map
+
   compilePage:(filepath)->
     file = @splitFilePath(filepath)
     if !file.path.match /\/partials\//

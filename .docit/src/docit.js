@@ -43,7 +43,7 @@ DocIt = (function() {
     this.jsonFilePrefix = this.isDev ? './' : '.docit/';
     prefix = this.isDev ? '../' : '';
     this.pagesFolder = "" + prefix + this.projectName + "-pages";
-    this.pageFiles = "" + this.pagesFolder + "/**/*.html";
+    this.pageFiles = "" + this.pagesFolder + "/**/*";
     return this.pageFilesJade = "" + this.pagesFolder + "/**/*";
   };
 
@@ -82,9 +82,6 @@ DocIt = (function() {
     it = this;
     return gaze(this.pageFiles, function(err, watcher) {
       it.watcher = watcher;
-      this.relative(function(err, files) {
-        return console.log(files);
-      });
       this.on('added', function(filepath) {
         var file, map;
         file = h.splitFilePath(filepath);
@@ -95,10 +92,7 @@ DocIt = (function() {
           filepath: filepath,
           map: it.map
         });
-        it.writeMap(map);
-        if (file.extension === '') {
-          return it.watcher.add(filepath);
-        }
+        return it.writeMap(map);
       });
       this.on('deleted', function(filepath) {
         var file, map;
@@ -112,7 +106,7 @@ DocIt = (function() {
         });
         return it.writeMap(map);
       });
-      this.on('renamed', function(filepath, oldpath) {
+      return this.on('renamed', function(filepath, oldpath) {
         var file, map, options;
         file = h.splitFilePath(filepath);
         if (!(file.extension === 'html')) {
@@ -133,9 +127,6 @@ DocIt = (function() {
           map = h.renamePageInMap(options);
           return it.writeMap(map);
         }
-      });
-      return this.on('all', function(e, filepath) {
-        return console.log(e, filepath);
       });
     });
   };

@@ -156,13 +156,13 @@ Helpers = (function() {
     filepath = o.filepath;
     file = this.splitFilePath(filepath);
     folderName = this.getFolder(filepath);
-    if (folder === ("" + this.pagesFolder + "/partials/")) {
-      return;
+    if (file.folder === "partials") {
+      return map;
     }
     folder = map[folderName];
     fileName = file.fileName;
     if (folder && __indexOf.call(folder, fileName) >= 0) {
-      return;
+      return map;
     } else {
       if (map[folderName] == null) {
         map[folderName] = [];

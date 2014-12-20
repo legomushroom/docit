@@ -70,6 +70,7 @@ describe 'docit', ->
         h.parseHtmlToJson(html).then (json)->
           expect(JSON.stringify(json)).toBe(expectedString)
           done()
+
     describe 'splitFilePath method ->', ->
       it 'should split path to pieces', ->
         file = h.splitFilePath './docit-pages/forms/form.html'
@@ -102,6 +103,18 @@ describe 'docit', ->
         map = {pages:[]}
         map = h.addPageToMap { map: map, filepath: path }
         expect(JSON.stringify(map)).toBe '{"pages":["colors"]}'
+      it 'should return a map if file is in folder already', ->
+        path = '/user/bin/docit-pages/colors.html'
+        map = {pages:['colors']}
+        map = h.addPageToMap { map: map, filepath: path }
+        expect(JSON.stringify(map)).toBe '{"pages":["colors"]}'
+
+      it 'should return a map if file is in partials folder', ->
+        path = '/user/bin/docit-pages/partials/colors.html'
+        map = {pages:[]}
+        map = h.addPageToMap { map: map, filepath: path }
+        expect(JSON.stringify(map)).toBe '{"pages":[]}'
+
     describe 'removePageFromMap method', ->
       it 'should remove page name from map', ->
         path = '/user/bin/docit-pages/type.html'
@@ -171,6 +184,8 @@ describe 'docit', ->
         docit.writeMap map
         pages = jf.readFileSync('pages.json')
         expect(JSON.stringify(pages)).toBe('{"pages":["buttons"]}')
+  
+
   describe 'file listeners ->', ()->
     describe 'html files ->', ()->
       it 'should generate map on file add', (done)->
@@ -191,25 +206,6 @@ describe 'docit', ->
           done()
         , 1000
 
-      # it 'should generate map on folder add', (done)->
-      #   fs.mkdirSync '../docit-pages/forms'
-      #   setTimeout ->
-      #     pages = jf.readFileSync('./pages.json')
-      #     expectedString = '{"pages":["buttons"],"forms":[]}'
-      #     expect(JSON.stringify(docit.map)).toBe(expectedString)
-      #     expect(JSON.stringify(pages)).toBe(expectedString)
-      #     done()
-      #   , 1000
-
-      # it 'should generate map on folder remove', (done)->
-      #   fse.removeSync '../docit-pages/forms/'
-      #   setTimeout ->
-      #     pages = jf.readFileSync('./pages.json')
-      #     expectedString = '{"pages":["buttons"]}'
-      #     expect(JSON.stringify(docit.map)).toBe(expectedString)
-      #     expect(JSON.stringify(pages)).toBe(expectedString)
-      #     done()
-      #   , 1000
       # it 'should generate map on file add', (done)->
 
       # describe 'page to json parsing', ->
@@ -231,7 +227,6 @@ describe 'docit', ->
       #             <p>an icon</p>
       #           </div>
       #         </card>'
-
       #     obj1 =
       #       name: 'Button'
       #       hash: 'af877455f5f70d21e4f999220c5c0e7f'
@@ -247,47 +242,49 @@ describe 'docit', ->
       #     expectedString = "[#{string1},#{string2}]"
 
       #     setTimeout =>
+            
+
       #       icons = jf.readFileSync('./json-pages/forms/icons.json')
       #       expect(JSON.stringify(icons)).toBe(expectedString)
       #       done()
       #     , 1000
 
-        # expect()
+      #   expect()
 
-    describe 'jade files ->', ()->
-      it 'should compile jade files on add', (done)->
-        fs.writeFileSync '../docit-pages/type.jade', 'h1 Heading from spec'
-        setTimeout ->
-          html = ''
-          expect(->
-            html = fs.readFileSync  '../docit-pages/type.html'
-            ).not.toThrow()
-          expect(html.toString()).toBe('<h1>Heading from spec</h1>')
-          done()
-        , 1000
-      it 'should compile jade files on change', (done)->
-        fs.writeFileSync '../docit-pages/type.jade', 'h1 Heading from spec #2'
-        setTimeout ->
-          htmlBuffer = fs.readFileSync  '../docit-pages/type.html'
-          expect(htmlBuffer.toString()).toBe('<h1>Heading from spec #2</h1>')
-          done()
-        , 1000
-      it 'should remove html file if jade file was removed(removeSon)', (done)->
-        filePath = '../docit-pages/type'
-        fs.unlinkSync "#{filePath}.jade"
-        setTimeout ->
-          expect(-> fs.readFileSync "#{filePath}.html").toThrow()
-          done()
-        , 1000
-      it 'should rename html file if jade file was renamed', (done)->
-        fs.writeFileSync '../docit-pages/forms-1.jade', 'h1 Heading'
-        oldFile = '../docit-pages/forms-1.jade'
-        newFile = '../docit-pages/forms.jade'
-        fs.renameSync oldFile, newFile
-        setTimeout ->
-          expect(-> fs.readFileSync '../docit-pages/forms.html').not.toThrow()
-          done()
-        , 1000
+  describe 'jade files ->', ()->
+    it 'should compile jade files on add', (done)->
+      fs.writeFileSync '../docit-pages/type.jade', 'h1 Heading from spec'
+      setTimeout ->
+        html = ''
+        expect(->
+          html = fs.readFileSync  '../docit-pages/type.html'
+          ).not.toThrow()
+        expect(html.toString()).toBe('<h1>Heading from spec</h1>')
+        done()
+      , 1000
+    it 'should compile jade files on change', (done)->
+      fs.writeFileSync '../docit-pages/type.jade', 'h1 Heading from spec #2'
+      setTimeout ->
+        htmlBuffer = fs.readFileSync  '../docit-pages/type.html'
+        expect(htmlBuffer.toString()).toBe('<h1>Heading from spec #2</h1>')
+        done()
+      , 1000
+    it 'should remove html file if jade file was removed(removeSon)', (done)->
+      filePath = '../docit-pages/type'
+      fs.unlinkSync "#{filePath}.jade"
+      setTimeout ->
+        expect(-> fs.readFileSync "#{filePath}.html").toThrow()
+        done()
+      , 1000
+    it 'should rename html file if jade file was renamed', (done)->
+      fs.writeFileSync '../docit-pages/forms-1.jade', 'h1 Heading'
+      oldFile = '../docit-pages/forms-1.jade'
+      newFile = '../docit-pages/forms.jade'
+      fs.renameSync oldFile, newFile
+      setTimeout ->
+        expect(-> fs.readFileSync '../docit-pages/forms.html').not.toThrow()
+        done()
+      , 1000
 
 
 

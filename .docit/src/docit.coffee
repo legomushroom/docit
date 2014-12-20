@@ -37,7 +37,7 @@ class DocIt
     # for testing purposes
     prefix = if @isDev then '../' else ''
     @pagesFolder = "#{prefix}#{@projectName}-pages"
-    @pageFiles    = "#{@pagesFolder}/**/*.html"
+    @pageFiles    = "#{@pagesFolder}/**/*"
     @pageFilesJade= "#{@pagesFolder}/**/*"
   createFolders:->
     nBaseurl = if @isDev then './' else '.docit/'
@@ -62,15 +62,12 @@ class DocIt
     it = @
     gaze @pageFiles, (err, watcher) ->
       it.watcher = watcher
-      @relative (err, files)-> console.log files
+      # @relative (err, files)-> console.log files
       @on 'added',   (filepath)->
         file = h.splitFilePath filepath
         return if !(file.extension is 'html')
         map = h.addPageToMap filepath: filepath, map: it.map
         it.writeMap map
-
-        if file.extension is ''
-          it.watcher.add filepath
 
       @on 'deleted', (filepath)->
         file = h.splitFilePath filepath
@@ -88,8 +85,7 @@ class DocIt
           map = h.renamePageInMap options
           it.writeMap map
       
-      @on 'all', (e, filepath)->
-        console.log e, filepath
+      # @on 'all', (e, filepath)-> console.log e, filepath
 
   listenJadePages:->
     it = @
